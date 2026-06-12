@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/base :: mainLayout(~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<section class="flex flex-col items-center justify-center py-20 text-center">
+    <h2 class="text-5xl font-black mb-6 italic uppercase tracking-tighter">Tu próximo viaje<br><span class="text-blue-500">empieza aquí.</span></h2>
+    <p class="text-slate-400 max-w-md mb-10 text-sm leading-relaxed">Accede al sistema para gestionar reservas, verificar disponibilidad y administrar la flota de vehículos en tiempo real.</p>
+    
+    <div class="flex gap-4">
+        <a th:href="@{/auth/login}" class="bg-blue-600 hover:bg-blue-500 text-white font-black py-4 px-8 rounded-2xl uppercase text-xs tracking-widest transition-all">Iniciar Sesión</a>
+        <a th:href="@{/auth/register}" class="bg-slate-800 hover:bg-slate-700 text-white font-black py-4 px-8 rounded-2xl uppercase text-xs tracking-widest transition-all">Registrarse</a>
+    </div>
+</section>
+</html>

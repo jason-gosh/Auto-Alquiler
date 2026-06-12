@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: mainLayout(~{::section})}">
+<body>
+    <section>
+        <div class="max-w-6xl mx-auto mt-10 p-4">
+            
+            <div class="mb-6">
+                <a th:href="@{/vehicles/list}" class="text-slate-500 hover:text-white text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                    Volver a la flota
+                </a>
+            </div>
+
+            <div th:if="${success}" class="bg-green-500/10 border border-green-500 text-green-500 p-4 rounded-xl mb-6 text-[10px] font-bold text-center uppercase tracking-widest" th:text="${success}"></div>
+            <div th:if="${error}" class="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-xl mb-6 text-[10px] font-bold text-center uppercase tracking-widest" th:text="${error}"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                
+                <div class="lg:col-span-7 space-y-4">
+                    <div id="mainImageWrapper" class="aspect-video bg-[#0f172a] rounded-3xl border border-slate-800 flex items-center justify-center overflow-hidden shadow-2xl">
+                        <img id="mainImage" th:if="${not #lists.isEmpty(vehicle.images)}" th:src="${vehicle.images[0].imagePath}" class="w-full h-full object-cover transition-all duration-300">
+                        <div id="noImageText" th:if="${#lists.isEmpty(vehicle.images)}" class="text-center">
+                            <p class="text-slate-600 font-black uppercase text-[10px] tracking-widest">Sin imágenes disponibles</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-5 gap-3">
+                        <div th:each="img : ${vehicle.images}" class="relative group aspect-square bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 hover:border-blue-500 transition-all">
+                            
+                            <img th:src="${img.imagePath}" class="w-full h-full object-cover cursor-pointer" onclick="switchPreview(this.src)">
+                            
+                            <form sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN')" th:action="@{/vehicles/details/{vId}/delete-image/{imgId}(vId=${vehicle.id}, imgId=${img.id})}" method="post" 
+                                  class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <button type="submit" 
+                                        title="Eliminar esta imagen"
+                                        class="bg-red-600/90 hover:bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-black transition-colors shadow-md">
+                                    ✕
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div th:if="${param.startDate != null and param.endDate != null}" class="pt-2">
+                        <a th:href="@{/reservations/initProcess/{id}(id=${vehicle.id}, startDate=${param.startDate}, endDate=${param.endDate}, reservationId=${param.reservationId})}" 
+                           class="w-full text-center block bg-blue-600 hover:bg-blue-500 text-white font-black uppercase text-[10px] py-4 rounded-xl transition-all tracking-widest shadow-lg shadow-blue-500/10">
+                           Iniciar reserva
+                        </a>
+                    </div>
+                
+                </div>
+
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-[#1e293b] border border-slate-800 p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+                        
+                        <span class="bg-blue-600/10 text-blue-500 text-[9px] font-black uppercase px-4 py-1.5 rounded-full border border-blue-500/20" th:text="${vehicle.type}"></span>
+                        <h2 class="text-4xl font-black text-white italic mt-4 tracking-tighter" th:text="${vehicle.brand + ' ' + vehicle.model}"></h2>
+                        <p class="text-slate-500 font-bold uppercase text-[11px] mt-1 tracking-[0.2em]" th:text="${'PLACA: ' + vehicle.plate}"></p>
+
+                        <hr class="border-slate-800 my-6">
+
+                        <div class="bg-[#0f172a] p-6 rounded-2xl border border-slate-800">
+                            <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-1">Costo de Alquiler / Día</p>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-4xl font-black text-green-500" 
+                                      th:text="${'$ ' + #numbers.formatInteger(vehicle.dailyRate, 1, 'POINT')}"></span>
+                                <span class="text-slate-600 text-[10px] font-bold uppercase">COP</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mt-6">
+                            <div class="p-4 bg-slate-800/50 rounded-2xl border border-slate-800">
+                                <p class="text-slate-500 text-[9px] font-black uppercase mb-1">Sede Actual</p>
+                                <p class="text-white text-xs font-bold" th:text="${vehicle.location.municipality + ' - ' + vehicle.location.department}"></p>
+                            </div>
+                            <div class="p-4 bg-slate-800/50 rounded-2xl border border-slate-800">
+                                <p class="text-slate-500 text-[9px] font-black uppercase mb-1">Año Modelo</p>
+                                <p class="text-white text-xs font-bold" th:text="${vehicle.year}"></p>
+                            </div>
+                            <div class="p-4 bg-slate-800/50 rounded-2xl border border-slate-800">
+                                <p class="text-slate-500 text-[9px] font-black uppercase mb-1">Estado</p>
+                                <span th:class="|text-xs font-black uppercase tracking-wider block mt-0.5 ${vehicle.status == 'Available' ? 'text-green-500' : (vehicle.status == 'Maintenance' ? 'text-orange-500' : 'text-blue-400')}|"
+                                      th:text="${vehicle.status}"></span>
+                            </div>
+                            <div class="p-4 bg-slate-800/50 rounded-2xl border border-slate-800">
+                                <p class="text-slate-500 text-[9px] font-black uppercase mb-1">Detalles Dirección</p>
+                                <p class="text-slate-300 text-xs font-bold truncate" 
+                                   th:title="${vehicle.locationDetails}"
+                                   th:text="${vehicle.locationDetails != null and vehicle.locationDetails != '' ? vehicle.locationDetails : 'Sin detalles'}"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN')" class="bg-[#1e293b] border border-slate-800 p-6 rounded-3xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-white text-[10px] font-black uppercase tracking-widest">Actualizar Galería</h3>
+                            <span class="text-slate-500 text-[9px] font-bold" th:text="${#lists.size(vehicle.images) + ' / 5 Fotos'}"></span>
+                        </div>
+                        
+                        <form th:action="@{/vehicles/details/{id}/add-image(id=${vehicle.id})}" method="post" class="space-y-4">
+                            
+                            <input type="url" name="imageUrl" id="imageUrlInput"
+                                   placeholder="Pegar URL de imagen (https://...)" 
+                                   th:disabled="${#lists.size(vehicle.images) >= 5}"
+                                   class="w-full bg-[#0f172a] border border-slate-800 rounded-xl px-4 py-3 text-white text-xs outline-none focus:border-blue-500 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                                   required>
+                            
+                            <p th:if="${#lists.size(vehicle.images) >= 5}" class="text-red-400 text-[9px] font-black uppercase tracking-widest text-center bg-red-500/5 border border-red-500/10 p-2 rounded-lg">
+                                * Ya no puede cargar más imágenes al vehículo. Límite alcanzado.
+                            </p>
+                    
+                            <button type="submit" 
+                                    id="submitImageBtn"
+                                    th:disabled="${#lists.size(vehicle.images) >= 5}"
+                                    class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase text-[10px] py-4 rounded-xl transition-all tracking-widest disabled:bg-slate-800 disabled:text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-blue-500/10">
+                                Añadir a la ficha
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            function switchPreview(imgSrc) {
+                const mainImg = document.getElementById('mainImage');
+                const noImageText = document.getElementById('noImageText');
+                
+                if (mainImg) {
+                    mainImg.src = imgSrc;
+                } else if (noImageText) {
+                    const wrapper = document.getElementById('mainImageWrapper');
+                    noImageText.remove();
+                    wrapper.innerHTML = `<img id="mainImage" src="${imgSrc}" class="w-full h-full object-cover transition-all duration-300">`;
+                }
+            }
+        </script>
+    </section>
+</body>
+</html>

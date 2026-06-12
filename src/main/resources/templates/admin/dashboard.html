@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: mainLayout(~{::content})}">
+<head>
+    <title>Panel de Control General</title>
+</head>
+<body>
+    <div th:fragment="content" class="space-y-8">
+
+        <div th:if="${param.success}" class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl">
+             <p class="text-[10px] font-black uppercase text-emerald-400 tracking-widest"
+                 th:text="${successMessage != null} ? ${successMessage} : 'Los datos Han sido cargados exitosamente.'">
+             </p>
+         </div>
+     
+         <div th:if="${param.error} or ${errorMessage}" class="bg-rose-500/10 border border-rose-500/20 p-4 rounded-xl space-y-1">
+             <p class="text-[10px] font-black uppercase text-rose-400 tracking-widest">Error al Procesar la Solicitud</p>
+             <p class="text-xs text-slate-300 font-medium"
+                 th:text="${errorMessage != null} ? ${errorMessage} : 'Ocurrió un fallo inesperado al procesar los datos.'">
+             </p>
+         </div>
+         
+        <div class="border-b border-slate-800 pb-4">
+            <h1 class="text-xl font-black uppercase tracking-tight text-white">Panel de Control General</h1>
+            <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">Gestión Centralizada de Clientes y Operaciones</p>
+        </div>
+
+        <a th:href="@{/admin/reports}" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold uppercase rounded tracking-wider block text-center mt-2">
+            Ver Reportes Estratégicos
+        </a>
+
+        <div class="bg-[#1e293b] border border-slate-800 rounded-3xl p-6 shadow-xl">
+            <h2 class="text-xs font-black uppercase text-blue-400 tracking-widest mb-4">Directorio de Clientes Registrados</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-[10px] font-black uppercase text-slate-500 tracking-widest bg-[#151f32]/50">
+                            <th class="p-3">Identificación</th>
+                            <th class="p-3">Nombre de Usuario</th>
+                            <th class="p-3">Correo Electrónico</th>
+                            <th class="p-3">Auditoría</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/40 text-xs font-medium">
+                        
+                        <tr th:unless="${#lists.isEmpty(clients)}" th:each="c : ${clients}" class="hover:bg-slate-800/30 transition-colors">
+                            <td class="p-3 font-mono text-slate-400 font-bold">
+                                <th:block th:if="${c.detail != null}">
+                                    <span th:text="${c.detail.typeIdentification.code} +' - '+ ${c.detail.identification}"></span>
+                                </th:block>
+                                <th:block th:if="${c.detail == null}">
+                                    <span class="inline-flex items-center text-[9px] font-black uppercase tracking-widest text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-lg">
+                                        ⚠️ Perfil Incompleto
+                                    </span>
+                                </th:block>
+                            </td>
+                            <td class="p-3 text-white font-bold" th:text="${c.username}"></td>
+                            <td class="p-3 text-slate-300" th:text="${c.email}"></td>
+                            <td class="p-3">
+                                <a th:href="@{/admin/clients/{id}/history(id=${c.id})}" class="text-[10px] font-black uppercase tracking-widest text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 px-3 py-1.5 rounded transition-colors">
+                                    Ver Historial
+                                </a>
+                            </td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(clients)}">
+                            <td colspan="4" class="p-4 text-center text-amber-500 uppercase text-[10px] font-black tracking-widest bg-amber-500/5 border border-dashed border-amber-500/20">
+                                Atención: No existen registros de clientes almacenados en el sistema en este momento.
+                            </td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-[#1e293b] border border-slate-800 rounded-3xl p-6 shadow-xl border-t-4 border-t-emerald-500">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xs font-black uppercase text-emerald-400 tracking-widest">Estado General de Operaciones</h2>
+                
+                <form th:action="@{/admin/dashboard}" method="get" class="flex gap-2">
+                    <select name="statusFilter" class="bg-[#151f32] text-slate-300 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border border-slate-700 outline-none focus:border-emerald-500 transition-colors">
+                        <option value="ALL" th:selected="${currentFilter == 'ALL'}">TODO</option>
+                        <option value="CONFIRMED" th:selected="${currentFilter == 'ACTIVE'}">CONFIRMADAS</option>
+                        <option value="PENDING" th:selected="${currentFilter == 'CANCELLED'}">PENDIENTES</option>
+                    </select>
+                    <button type="submit" class="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/40 hover:text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-lg transition-colors border border-emerald-500/30">
+                        Filtrar
+                    </button>
+                </form>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-[10px] font-black uppercase text-slate-500 tracking-widest bg-[#151f32]/50">
+                            <th class="p-3">N° Contrato</th>
+                            <th class="p-3">Vehículo Asignado</th>
+                            <th class="p-3">Vigencia del Contrato</th>
+                            <th class="p-3">Monto Total</th>
+                            <th class="p-3">Gestionar Pago</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/40 text-xs font-medium">
+                        
+                        <tr th:unless="${#lists.isEmpty(reservations)}" th:each="r : ${reservations}" class="hover:bg-slate-800/30 transition-colors">
+                            <td class="p-3 font-mono font-black text-emerald-400" th:text="${r.contractNumber}"></td>
+                            <td class="p-3 text-white" th:text="${r.vehicle.brand + ' ' + r.vehicle.model}"></td>
+                            <td class="p-3 text-slate-300 font-mono text-[11px]" th:text="${r.startDate + ' a ' + r.endDate}"></td>
+                            <td class="p-3 text-white font-mono font-bold" th:text="${'$' + r.totalAmount}"></td>
+                            <td class="p-3 text-white">
+                                <a th:href="@{/admin/payment/manage/{reservationId}(reservationId=${r.id})}" 
+                                   class="inline-flex items-center justify-center px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-white bg-blue-600 rounded hover:bg-blue-500 transition-colors"
+                                   th:text="'Gestionar'">
+                                </a>
+                            </td>
+                            
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(reservations)}">
+                            <td colspan="5" class="p-4 text-center text-slate-400 uppercase text-[10px] font-black tracking-widest bg-slate-800/20">
+                                Informativo: No se encontraron operaciones bajo los parámetros actuales.
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

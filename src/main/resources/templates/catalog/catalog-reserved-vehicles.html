@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout/base :: mainLayout(~{::section})}">
+<body>
+    <section class="max-w-7xl mx-auto mt-10 p-4">
+        
+        <div class="mb-8">
+            <h1 class="text-3xl font-black text-white italic tracking-tighter">MIS VEHÍCULOS RESERVADOS</h1>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Selecciona las nuevas fechas para gestionar o modificar tu reserva</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+            <div class="lg:col-span-1">
+                <div class="bg-[#1e293b] border border-slate-800 p-6 rounded-3xl sticky top-6">
+                    <div class="flex justify-between items-center mb-6 gap-2">
+                        <h3 class="text-white text-[10px] font-black uppercase tracking-widest m-0">Nuevas Fechas</h3>
+                        
+                        <a th:href="@{/catalog}" 
+                           class="bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white border border-blue-500/30 text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg transition-all shadow-lg shadow-blue-500/10 whitespace-nowrap">
+                            Ver Catálogo
+                        </a>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest block mb-1">Nueva Recogida</label>
+                            <input type="date" id="newStartDate" class="w-full bg-[#0f172a] border border-slate-800 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-blue-500 transition-all" th:min="${todayDate}" required>
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest block mb-1">Nueva Devolución</label>
+                            <input type="date" id="newEndDate" class="w-full bg-[#0f172a] border border-slate-800 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-blue-500 transition-all" th:min="${todayDate}" required>
+                        </div>
+                    </div>
+                    
+                    <p class="text-[9px] text-slate-500 font-medium mt-4 leading-relaxed uppercase tracking-wider">
+                        * Define primero el nuevo rango de fechas aquí arriba para poder habilitar la modificación de cualquiera de tus reservas.
+                    </p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3">
+                <!-- Mensajes emergente -->
+                <div th:if="${success}" class="bg-emerald-500/10 border border-emerald-500 text-emerald-400 p-4 rounded-xl mb-6 text-[10px] font-bold text-center uppercase tracking-widest shadow-lg shadow-emerald-500/5 animate-fade-in" th:text="${success}"></div>
+                <div th:if="${error}" class="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-xl mb-6 text-[10px] font-bold text-center uppercase tracking-widest" th:text="${error}"></div>
+
+                <div th:if="${#lists.isEmpty(reservations)}" class="bg-[#1e293b] border border-slate-800 p-10 rounded-3xl text-center">
+                    <p class="text-slate-500 font-bold text-xs uppercase tracking-widest">No posees registros de reservas activas en el sistema.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div th:each="r : ${reservations}" th:with="v=${r.vehicle}" class="bg-[#1e293b] border border-slate-800 rounded-3xl overflow-hidden hover:border-slate-600 transition-all group flex flex-col">
+                        
+                        <div class="aspect-[4/3] bg-slate-800 relative overflow-hidden">
+                            <img th:if="${not #lists.isEmpty(v.images)}" th:src="${v.images[0].imagePath}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            <div th:if="${#lists.isEmpty(v.images)}" class="w-full h-full flex items-center justify-center text-slate-600 text-[10px] font-black uppercase tracking-widest">Sin Foto</div>
+                            
+                            <span class="absolute top-3 left-3 bg-emerald-600/90 text-white text-[8px] font-black uppercase px-3 py-1 rounded-full backdrop-blur-sm tracking-wider" th:text="'RESERVA: #' + ${r.contractNumber}"></span>
+                            <span class="absolute top-3 right-3 bg-blue-600/90 text-white text-[8px] font-black uppercase px-3 py-1 rounded-full backdrop-blur-sm" th:text="${v.type}"></span>
+                        </div>
+
+                        <div class="p-5 flex flex-col flex-grow">
+                            <h4 class="text-xl font-black text-white italic tracking-tight" th:text="${v.brand + ' ' + v.model}"></h4>
+                            
+                            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1 mb-3 flex items-center gap-1">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                <span th:text="${v.location.municipality + ' - ' + v.location.department}"></span>
+                            </p>
+
+                            <div class="bg-[#0f172a] border border-slate-800/60 rounded-xl p-3 mb-4">
+                                <div class="flex justify-between text-[9px] uppercase font-black tracking-widest mb-1">
+                                    <span class="text-slate-500">Periodo Actual:</span>
+                                    <span class="text-slate-300" th:text="${r.startDate} + ' al ' + ${r.endDate}"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-auto pt-4 border-t border-slate-800 flex justify-between items-end">
+                                <div>
+                                    <p class="text-slate-500 text-[8px] font-black uppercase tracking-widest">Costo Total Pagado</p>
+                                    <p class="text-green-500 font-black text-lg" th:text="${'$ ' + #numbers.formatInteger(r.totalAmount, 1, 'POINT')}"></p>
+                                </div>
+                                
+                                <div class="mt-4 flex gap-3 justify-end">
+                                    <a sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN')" 
+                                       href="#"
+                                       data-role="ADMIN" 
+                                       th:data-reservation-id="${r.id}"
+                                       class="btn-modify bg-white text-slate-900 hover:bg-slate-200 font-black uppercase text-[9px] px-4 py-2 rounded-lg transition-colors tracking-widest">
+                                        Modificar
+                                    </a>
+
+                                    <a sec:authorize="hasRole('CLIENT')" 
+                                       href="#"
+                                       data-role="CLIENT" 
+                                       th:data-reservation-id="${r.id}"
+                                       th:data-vehicle-id="${v.id}"
+                                       class="btn-modify bg-white text-slate-900 hover:bg-slate-200 font-black uppercase text-[9px] px-4 py-2 rounded-lg transition-colors tracking-widest">
+                                        Modificar
+                                    </a>
+                                    
+                                    <button sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN')"
+                                                type="button"
+                                                class="btn-delete-reservation text-red-500 hover:text-red-400 text-[10px] font-black uppercase tracking-widest transition-colors px-3 py-2 bg-red-500/10 rounded-lg"
+                                                th:data-id="${r.id}"
+                                                th:data-contract="${r.contractNumber}">
+                                        Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL DE BORRADO DE RESERVAS -->
+
+        <div id="deleteReservationModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
+            <div class="bg-[#1e293b] border border-slate-700 w-full max-w-md rounded-3xl p-8 shadow-2xl border-t-4 border-t-red-600">
+                <div class="text-center">
+                    <h3 class="text-white font-black uppercase tracking-tight text-lg">Confirmar Eliminación de Reserva</h3>
+                    <p class="text-slate-400 text-[11px] mt-2 leading-relaxed uppercase font-bold tracking-wider">
+                        Esta acción es irreversible. Escribe el número único de contrato 
+                        <span id="modalContractDisplay" class="text-red-400 block my-1 font-mono text-xs select-all"></span> 
+                        para confirmar el borrado:
+                    </p>
+                </div>
+                <div class="mt-6">
+                    <input
+                        type="text"
+                        id="confirmContractInput"
+                        class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-4 py-4 text-white text-center font-black uppercase tracking-[0.1em] outline-none font-mono text-sm"
+                        placeholder="CONTRATO-XXXX"
+                        autocomplete="off"
+                    />
+                    <div class="flex gap-3 mt-6">
+                        <button
+                            type="button"
+                            onclick="closeDeleteReservationModal()"
+                            class="flex-1 px-4 py-3 bg-slate-800 text-slate-400 rounded-xl font-black uppercase text-[10px] tracking-widest"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            type="button"
+                            id="confirmDeleteReservationBtn"
+                            disabled
+                            class="flex-1 px-4 py-3 bg-red-600/10 text-red-500/30 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all"
+                        >
+                            Confirmar Borrar
+                        </button>
+        
+                        <form id="deleteReservationForm" th:action="@{/reservations/delete/0}" method="post" style="display: none;">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const startDateInput = document.getElementById('newStartDate');
+                const endDateInput = document.getElementById('newEndDate');
+
+                // Configuración de rangos mínimos en los inputs de fecha
+
+                startDateInput.addEventListener('change', function() {
+                    if (startDateInput.value) {
+                        endDateInput.min = startDateInput.value;
+                        if (endDateInput.value && endDateInput.value < startDateInput.value) {
+                            endDateInput.value = startDateInput.value;
+                        }
+                    } else {
+                      endDateInput.min = /*[[${todayDate}]]*/ '';
+                    }
+                });
+
+                // Interceptor de acciones dinámicas de modificación según el ROL
+                document.querySelectorAll('.btn-modify').forEach(button => {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault(); // Detener redirección por defecto
+
+                        const selectedStart = startDateInput.value;
+                        const selectedEnd = endDateInput.value;
+
+                        // REGRA DE UX: Bloqueo absoluto si no se han digitado ambas fechas temporales
+                        if (!selectedStart || !selectedEnd) {
+                            if (!selectedStart) startDateInput.classList.add('border-red-500');
+                            if (!selectedEnd) endDateInput.classList.add('border-red-500');
+                            
+                            setTimeout(() => {
+                                startDateInput.classList.remove('border-red-500');
+                                endDateInput.classList.remove('border-red-500');
+                            }, 1200);
+                            return;
+                        }
+
+                        // Recuperación de metadatos del elemento DOM
+                        const role = this.getAttribute('data-role');
+                        const reservationId = this.getAttribute('data-reservation-id');
+
+                        if (role === 'ADMIN') {
+                            window.location.href = `/catalog?startDate=${selectedStart}&endDate=${selectedEnd}&type=&locationId=&maxPrice=&reservationId=${reservationId}`;
+                        } else if (role === 'CLIENT') {
+                            const vehicleId = this.getAttribute('data-vehicle-id');
+                            window.location.href = `/reservations/initProcess/${vehicleId}?startDate=${selectedStart}&endDate=${selectedEnd}&reservationId=${reservationId}`;
+                        } 
+                    });
+                });
+            });
+
+
+            let activeReservationId = null;
+            let activeContractNumber = "";
+            
+            document.addEventListener("DOMContentLoaded", () => {
+                // Escuchar los clicks en los botones de eliminar de las tarjetas
+                const deleteResButtons = document.querySelectorAll(".btn-delete-reservation");
+                deleteResButtons.forEach((btn) => {
+                    btn.addEventListener("click", function () {
+                        activeReservationId = this.getAttribute("data-id");
+                        activeContractNumber = this.getAttribute("data-contract").trim();
+                        openDeleteReservationModal(activeContractNumber);
+                    });
+                });
+            
+                // Validar el texto del input en tiempo real
+                const contractInput = document.getElementById("confirmContractInput");
+                if (contractInput) {
+                    contractInput.addEventListener("input", function (e) {
+                        const currentVal = e.target.value.trim().toUpperCase();
+                        const targetVal = activeContractNumber.toUpperCase();
+                        setReservationBtnState(currentVal === targetVal);
+                    });
+                }
+            });
+            
+            function openDeleteReservationModal(contract) {
+                document.getElementById("modalContractDisplay").innerText = contract;
+                document.getElementById("deleteReservationModal").classList.remove("hidden");
+                const input = document.getElementById("confirmContractInput");
+                input.value = "";
+                input.focus();
+                setReservationBtnState(false);
+            }
+            
+            function closeDeleteReservationModal() {
+                document.getElementById("deleteReservationModal").classList.add("hidden");
+            }
+            
+            function setReservationBtnState(enabled) {
+                const btn = document.getElementById("confirmDeleteReservationBtn");
+                const form = document.getElementById("deleteReservationForm");
+                
+                if (enabled) {
+                    btn.disabled = false;
+                    btn.classList.remove("bg-red-600/10", "text-red-500/30");
+                    btn.classList.add("bg-red-600", "text-white", "shadow-lg", "shadow-red-500/20");
+                    btn.onclick = function(e) {
+                        e.preventDefault(); 
+                        let baseAction = form.getAttribute("action");
+                        // Reemplazamos el ID dummy '0' por el ID real capturado de la reserva
+                        form.action = baseAction.replace("/0", "/" + activeReservationId);
+                        form.submit(); 
+                    };
+                } else {
+                    btn.disabled = true;
+                    btn.classList.remove("bg-red-600", "text-white", "shadow-lg", "shadow-red-500/20");
+                    btn.classList.add("bg-red-600/10", "text-red-500/30");
+                    btn.onclick = null;
+                }
+            }
+        </script>
+    </section>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" 
+      th:fragment="mainLayout(content)">
+<head>
+    <meta charset="UTF-8">
+    <title>AutoAlquiler - Panel de Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0f172a] text-slate-200 min-h-screen flex flex-col">
+    <nav class="border-b border-slate-800 bg-[#1e293b] p-4 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a th:href="@{/}" class="font-black italic tracking-tighter text-white uppercase text-lg hover:opacity-80 transition-opacity">
+                AutoAlquiler
+            </a>
+            
+            <div sec:authorize="isAuthenticated()" class="relative inline-block text-left">
+                <button id="menuDropdownButton" type="button" class="inline-flex items-center gap-2 border border-slate-700 bg-[#0f172a] text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-slate-800 transition-all uppercase tracking-wider">
+                    <span>Menú de Operaciones</span>
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+
+                <div id="menuDropdownContent" class="hidden absolute right-0 mt-2 w-56 rounded-2xl bg-[#1e293b] border border-slate-700 shadow-2xl overflow-hidden py-1.5 transform opacity-0 scale-95 transition-all duration-100 z-50">
+                    <div class="px-4 py-2 border-b border-slate-800 bg-[#151f32]">
+                        <p class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Usuario Activo</p>
+                        <p class="text-xs font-mono font-bold text-blue-400 truncate" sec:authentication="name">Username</p>
+                    </div>
+
+                    <div class="p-1 flex flex-col gap-0.5">
+                        <a sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN')" 
+                           th:href="@{/vehicles/list}" 
+                           class="text-left text-slate-300 hover:text-white text-[11px] font-bold uppercase tracking-wider px-3 py-2 hover:bg-slate-800/60 rounded-xl transition-colors">
+                            Inicio (Gestión)
+                        </a>
+                        <a sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN')" 
+                           th:href="@{/catalog}" 
+                           class="text-left text-slate-300 hover:text-white text-[11px] font-bold uppercase tracking-wider px-3 py-2 hover:bg-slate-800/60 rounded-xl transition-colors">
+                            Catálogo General
+                        </a>
+                        <a sec:authorize="hasAnyRole('ADMIN', 'SUPER_ADMIN')" 
+                           th:href="@{/admin/dashboard}" 
+                           class="text-left text-blue-400 hover:text-blue-300 text-[11px] font-black uppercase tracking-wider px-3 py-2 hover:bg-slate-800/60 rounded-xl transition-colors border-t border-slate-800/40">
+                            Control General 
+                        </a>
+
+                        <a sec:authorize="hasRole('CLIENT')" 
+                           th:href="@{/catalog}" 
+                           class="text-left text-slate-300 hover:text-white text-[11px] font-bold uppercase tracking-wider px-3 py-2 hover:bg-slate-800/60 rounded-xl transition-colors">
+                            Inicio (Catálogo)
+                        </a>
+                        <a sec:authorize="isAuthenticated()" 
+                           th:href="@{/users/profile}" 
+                           class="text-left text-emerald-400 hover:text-emerald-300 text-[11px] font-black uppercase tracking-wider px-3 py-2 hover:bg-slate-800/60 rounded-xl transition-colors border-t border-slate-800/40">
+                            Mi Perfil e Historial
+                        </a>
+                    </div>
+
+                    <div class="border-t border-slate-800 p-1 bg-[#151f32]">
+                        <form th:action="@{/auth/logout}" method="post" class="m-0">
+                            <button type="submit" class="w-full text-left text-red-400 hover:text-red-300 text-[10px] font-black uppercase tracking-widest px-3 py-2 hover:bg-red-500/10 rounded-xl transition-colors">
+                                Cerrar Sesión
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div sec:authorize="!isAuthenticated()">
+                <a th:href="@{/auth/login}" class="text-xs font-black text-blue-500 uppercase tracking-widest hover:underline">Ingresar al Sistema</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="p-6 flex-grow max-w-7xl w-full mx-auto">
+        <div th:replace="${content}"></div>
+    </main>
+
+    <footer class="p-6 border-t border-slate-900 bg-[#151f32]/40 text-center text-[9px] text-slate-600 font-bold uppercase tracking-widest">
+        &copy; 2026 - Gestión de Sistemas | Integridad de Datos Centralizada
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const btn = document.getElementById("menuDropdownButton");
+            const menu = document.getElementById("menuDropdownContent");
+
+            if(btn && menu) {
+                btn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    const isHidden = menu.classList.contains("hidden");
+                    if(isHidden) {
+                        menu.classList.remove("hidden");
+                        setTimeout(() => {
+                            menu.classList.remove("opacity-0", "scale-95");
+                        }, 10);
+                    } else {
+                        menu.classList.add("opacity-0", "scale-95");
+                        setTimeout(() => {
+                            menu.classList.add("hidden");
+                        }, 100);
+                    }
+                });
+
+                document.addEventListener("click", () => {
+                    if(!menu.classList.contains("hidden")) {
+                        menu.classList.add("opacity-0", "scale-95");
+                        setTimeout(() => {
+                            menu.classList.add("hidden");
+                        }, 100);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
