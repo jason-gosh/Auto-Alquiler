@@ -1,0 +1,348 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: mainLayout(~{::section})}">
+<body>
+    <section>
+        <div class="max-w-6xl mx-auto bg-[#1e293b] border border-slate-800 p-8 rounded-3xl shadow-2xl mt-10">
+            
+            <div class="flex justify-between items-center mb-8 border-b border-slate-800 pb-6">
+                <div>
+                    <h2 class="text-xl font-black uppercase italic text-white tracking-tight">Revisa y Confirma tu Reserva</h2>
+                    <p class="text-slate-500 text-[10px] uppercase font-bold tracking-widest mt-1">Verifica la información antes de finalizar</p>
+                </div>
+                <div>
+                    <a th:href="@{/admin/dashboard}" 
+                       class="px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all text-slate-400">
+                         Ir al panel administrativo
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">         
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="bg-[#0f172a]/40 border border-slate-800 p-6 rounded-3xl">
+                        <div class="w-full aspect-video rounded-2xl overflow-hidden border border-slate-800 bg-[#0f172a] mb-5 relative group">
+                            <img th:src="${vehicle.images != null and !vehicle.images.empty ? vehicle.images[0].imagePath : '/images/default-vehicle.png'}" 
+                                 alt="Previsualización del vehículo" 
+                                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-[#1e293b]/80 via-transparent to-transparent"></div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="bg-blue-600/10 text-blue-500 text-[10px] font-black uppercase px-3 py-1 rounded-full border border-blue-500/20" th:text="${vehicle.type}">Categoría</span>
+                            <span th:if="${vehicle.location != null}" class="bg-emerald-600/10 text-emerald-500 text-[10px] font-black uppercase px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                <span th:text="${vehicle.location.department + ' - ' + vehicle.location.municipality}">Ubicación</span>
+                            </span>
+                        </div>
+                        
+                        <h3 class="text-3xl font-black text-white italic mt-3 tracking-tighter" th:text="${vehicle.brand + ' ' + vehicle.model}">Marca</h3>
+                        <p class="text-slate-500 font-bold uppercase text-[10px] mt-1 tracking-widest" th:text="${'Matrícula / Placa: ' + vehicle.plate}">Placa</p>
+
+                        <hr class="border-slate-800 my-5">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="p-4 bg-[#0f172a] rounded-2xl border border-slate-800">
+                                <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-1">Fecha de Entrega</p>
+                                <p class="text-white text-sm font-bold" th:text="${startDate}"></p>
+                            </div>
+                            <div class="p-4 bg-[#0f172a] rounded-2xl border border-slate-800">
+                                <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-1">Fecha de Devolución</p>
+                                <p class="text-white text-sm font-bold" th:text="${endDate}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 space-y-3 relative">
+                    <div class="hidden lg:flex items-center justify-between w-full px-4 h-6">
+                        <div id="pulse-dot-1" class="w-2.5 h-2.5 rounded-full bg-[#00f2fe] shadow-[0_0_10px_#00f2fe] border-2 border-[#1e293b] z-10 animate-pulse"></div>
+                        <div class="flex-1 border-t-2 border-dashed border-slate-700/60 mx-3"></div>
+                        <div id="pulse-dot-2" class="w-2.5 h-2.5 rounded-full bg-[#334155] border-2 border-[#1e293b] z-10"></div>
+                    </div>
+
+                    <div id="card-step-1" class="bg-[#0f172a]/60 border border-slate-800 p-6 rounded-3xl transition-all duration-500 transform opacity-100 scale-100">
+                        <h2 class="text-sm font-black text-white uppercase tracking-wider mb-4">Resumen Financiero</h2>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-400 font-medium">Tarifa diaria</span>
+                                <span class="text-white font-bold" th:text="${'$' + vehicle.dailyRate}">$0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-400 font-medium">Periodo total</span>
+                                <span class="text-white font-bold" th:text="${totalDays + ' ' + (totalDays == 1 ? 'día' : 'días')}">0 días</span>
+                            </div>
+                            <hr class="border-slate-800 my-2">
+                            <div class="flex justify-between items-center pt-2">
+                                <span class="text-sm font-bold text-white uppercase tracking-wider">Importe Total</span>
+                                <span class="text-2xl font-black text-emerald-400 tracking-tight" th:text="${'$' + totalPrice}">$0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <button type="button" onclick="goToStep2()" 
+                                    class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase text-[10px] py-4 rounded-xl transition-all tracking-widest shadow-lg shadow-emerald-500/20 cursor-pointer text-center">
+                                Confirmar y Continuar ➡️
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="card-step-2" class="bg-[#0f172a]/60 border border-slate-800 p-6 rounded-3xl transition-all duration-500 transform opacity-0 scale-95 translate-x-8 hidden">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-sm align-center font-black text-white uppercase tracking-wider">Datos del Conductor</h2>
+                            <button type="button" onclick="goToStep1()" class="text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-400 transition-colors">
+                                ⬅️ Atrás
+                            </button>
+                        </div>
+                        <div class="bg-[#1e293b]/40 border border-slate-600 p-3 rounded-3xl">
+                            <form th:action="@{/reservations/save}" th:object="${reservationForm}" method="POST" onsubmit="setAllFieldsEnabled()" class="space-y-4">
+                                <input type="hidden" id="locationIdInput" name="locationId" th:value="${locationId}" />
+                                <input type="hidden" name="vehicleId" th:value="${vehicleId}" />
+                                <input type="hidden" name="startDate" th:value="${startDate}" />
+                                <input type="hidden" name="endDate" th:value="${endDate}" />
+                                <input type="hidden" name="reservationId" th:value="${reservationId}" />
+
+                                <div id="driverFormContainer" 
+                                     th:data-role="${#authorization.expression('hasAnyRole(''ADMIN'', ''SUPER_ADMIN'')') ? 'STAFF' : 'CLIENT'}">    
+                                </div>
+                                
+                                <div th:if="${userDetail}" id="clientData" >
+                                    
+                                </div>
+                                <div class="grid grid-cols-1 gap-3">
+                                    <div>
+                                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Tipo Identificación</label>
+                                        <select class="w-full bg-[#151f32] text-white text-xs font-mono font-bold rounded-xl p-3 border border-slate-700 outline-none focus:border-blue-500 disabled:opacity-40 disabled:bg-[#111927] disabled:border-slate-800 disabled:cursor-not-allowed"
+                                            id="idTypeSelect" 
+                                            th:field="*{identificationType}" 
+                                            required
+                                        >
+                                            <option text="" value="" disabled selected>Seleccione...</option>
+                                            <option th:each="id : ${identifications}" th:value="${id.id}" th:text="${id.code + ' - ' + id.name}"></option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Identificación</label>
+                                        <input class="w-full bg-[#151f32] text-white text-xs font-mono font-bold rounded-xl p-3 border border-slate-700 outline-none focus:border-blue-500 disabled:opacity-40 disabled:bg-[#111927] disabled:border-slate-800 disabled:cursor-not-allowed"
+                                            id="documentId"
+                                            th:field="*{identification}"
+                                            type="text"
+                                            placeholder="Ingrese la identificación..."
+                                            required
+                                        />
+                                    </div>
+                                    <div id="lookup-status" class="text-[9px] uppercase font-bold tracking-wider hidden"></div>
+
+                                    <div>
+                                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Nombre Completo</label>
+                                        <input class="w-full bg-[#151f32] text-white text-xs font-mono font-bold rounded-xl p-3 border border-slate-700 outline-none focus:border-blue-500 disabled:opacity-40 disabled:bg-[#111927] disabled:border-slate-800 disabled:cursor-not-allowed"
+                                            id="clientNameInput" 
+                                            th:field="*{name}"
+                                            type="text"
+                                            placeholder="Ingrese el nombre completo..."
+                                            required
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Dirección de Residencia</label>
+                                        <input class="w-full bg-[#151f32] text-white text-xs font-mono font-bold rounded-xl p-3 border border-slate-700 outline-none focus:border-blue-500 disabled:opacity-40 disabled:bg-[#111927] disabled:border-slate-800 disabled:cursor-not-allowed"
+                                            id="addressInput"
+                                            th:field="*{address}" 
+                                            type="text"
+                                            placeholder="Ingrese la dirección de residencia..."
+                                            required
+                                        />
+                                    </div>
+                                    
+                                    <div th:replace="~{layout/selectors/location-phone-selectors :: renderCascadeSelectors(
+                                        'countryId', 
+                                        'department', 
+                                        'municipality', 
+                                        'phone', 
+                                        true
+                                        )}">
+                                    </div>
+                                </div>
+
+                                <div class="pt-2">
+                                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black uppercase text-[10px] py-4 rounded-xl transition-all tracking-widest shadow-lg shadow-blue-500/20 cursor-pointer text-center">
+                                        💾 Procesar Alquiler
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+          const card1 = document.getElementById('card-step-1');
+          const card2 = document.getElementById('card-step-2');
+          const dot1 = document.getElementById('pulse-dot-1');
+          const dot2 = document.getElementById('pulse-dot-2');
+          
+          const documentIdInput = document.getElementById('documentId');
+          const locationIdInput = document.getElementById('locationIdInput');
+          const clientNameInput = document.getElementById('clientNameInput');
+          const phoneInput = document.getElementById('phoneInput');
+          const addressInput = document.getElementById('addressInput');
+          
+          const countrySelect = document.getElementById('countrySelect');
+          const documentIdTypeSelect = document.getElementById('idTypeSelect');
+          const departmentSelect = document.getElementById('departmentSelect');
+          const municipalitySelect = document.getElementById('municipalitySelect');
+          const phonePrefix = document.getElementById('phonePrefix');
+          
+          const container = document.getElementById("driverFormContainer");
+
+          const lookupStatus = document.getElementById('lookup-status');
+
+          const role = container.getAttribute("data-role");
+          const identification = /*[[${identification}]]*/ null;
+          const identificationTypeId = /*[[${identificationTypeId}]]*/ null;
+
+          function goToStep2() {
+              card1.classList.add('opacity-0', 'scale-95', '-translate-x-8');
+              setTimeout(() => {
+                  card1.classList.add('hidden');
+                  card2.classList.remove('hidden');
+                  
+                  dot1.classList.remove('bg-[#00f2fe]', 'shadow-[0_0_10px_#00f2fe]', 'animate-pulse');
+                  dot1.classList.add('bg-[#334155]');
+                  dot2.classList.add('bg-[#00f2fe]', 'shadow-[0_0_10px_#00f2fe]', 'animate-pulse');
+                  dot2.classList.remove('bg-[#334155]');
+                  
+                  setTimeout(() => {
+                      card2.classList.remove('opacity-0', 'scale-95', 'translate-x-8');
+                      card2.classList.add('opacity-100', 'scale-100', 'translate-x-0');
+                  }, 50);
+              }, 300);
+          }
+
+          function goToStep1() {
+              card2.classList.remove('opacity-100', 'scale-100', 'translate-x-0');
+              card2.classList.add('opacity-0', 'scale-95', 'translate-x-8');
+              setTimeout(() => {
+                  card2.classList.add('hidden');
+                  card1.classList.remove('hidden');
+                  
+                  dot2.classList.remove('bg-[#00f2fe]', 'shadow-[0_0_10px_#00f2fe]', 'animate-pulse');
+                  dot2.classList.add('bg-[#334155]');
+                  dot1.classList.add('bg-[#00f2fe]', 'shadow-[0_0_10px_#00f2fe]', 'animate-pulse');
+                  dot1.classList.remove('bg-[#334155]');
+
+                  setTimeout(() => {
+                      card1.classList.remove('opacity-0', 'scale-95', '-translate-x-8');
+                      card1.classList.add('opacity-100', 'scale-100', 'translate-x-0');
+                  }, 50);
+              }, 300);
+          }
+
+          function setFieldsDisabledState(state) {
+              countrySelect.disabled = state;
+              departmentSelect.disabled = state;
+              municipalitySelect.disabled = state; 
+              clientNameInput.disabled = state;
+              addressInput.disabled = state;
+              phoneInput.disabled = state;
+          }
+
+          function findExistingUser() {
+              const idTypeId = documentIdTypeSelect.value;
+              const identification = documentIdInput.value.trim();
+              
+              if (!idTypeId || !identification) {
+                  setFieldsDisabledState(true);
+                  return;
+              }
+
+              lookupStatus.classList.remove('hidden');
+              lookupStatus.className = "text-[9px] uppercase font-bold tracking-wider text-slate-400";
+              lookupStatus.innerText = "🔍 Verificando registro...";
+
+              fetch(`/users/lookup?idTypeId=${idTypeId}&identification=${identification}`)
+                  .then(response => response.json())
+                  .then(data => {
+                      if (data.found) {
+                          setFieldsDisabledState(true);
+                          clientNameInput.value = data.name || '';
+                          phoneInput.value = data.phone || '';
+                          addressInput.value = data.address || '';
+                          locationIdInput.value = data.locationId || 0;
+                          
+                          if (typeof window.hydrateLocationCascade === 'function') {
+                              window.hydrateLocationCascade({
+                                countryId: data.countryId,
+                                department: data.department,
+                                municipality: data.municipality,
+                                preloadedDepartments: data.preloadedDepartments,
+                                preloadedMunicipalities: data.preloadedMunicipalities
+                              });
+                          }
+
+                          setTimeout(() => {
+                            if (role === "CLIENT") {
+                                setFieldsDisabledState(true);  
+                                console.log("Modo Cliente: Campos bloqueados.");
+                            } else {
+                                setFieldsDisabledState(false); 
+                                console.log("Modo Staff: Campos habilitados.");
+                            }
+                          }, 500);
+                          
+                          lookupStatus.className = "text-[9px] uppercase font-bold tracking-wider text-emerald-400";
+                          lookupStatus.innerText = "✅ Cliente encontrado. Datos importados.";
+                      } else {
+                          clientNameInput.value = '';
+                          phoneInput.value = '';
+                          addressInput.value = '';
+                          countrySelect.value = '';
+                          departmentSelect.innerHTML = '<option value="">-- Seleccione un Departamento --</option>';
+                          municipalitySelect.innerHTML = '<option value="">-- Seleccione primero un Departamento --</option>';
+                          phonePrefix.textContent = '--';
+                          lookupStatus.className = "text-[9px] uppercase font-bold tracking-wider text-blue-400";
+                          lookupStatus.innerText = (data.userId != null && role !== "CLIENT") ? 
+                            "📝 Modificando sus datos. Edite los datos.":
+                            "📝 Cliente nuevo. Registre los datos." ;
+
+                          setFieldsDisabledState(false);
+                      }
+                  })
+                  .catch(err => {
+                      console.error("Error en consulta de usuario:", err);
+                      lookupStatus.classList.add('hidden');
+                      setFieldsDisabledState(false);
+                  });
+          }
+          
+          function setAllFieldsEnabled(){
+            countrySelect.disabled = false;
+            departmentSelect.disabled = false;
+            municipalitySelect.disabled = false; 
+            documentIdInput.disabled = false;
+            documentIdTypeSelect.disabled = false;
+            clientNameInput.disabled = false;
+            addressInput.disabled = false;
+            phoneInput.disabled = false;
+          }
+          
+          documentIdInput.addEventListener('input', findExistingUser);
+          documentIdTypeSelect.addEventListener('change', findExistingUser);
+          setFieldsDisabledState(true);
+
+           
+          if (role === "CLIENT" && identification != null && identificationTypeId != null && identification !== "" && Number(identificationTypeId) > 0){
+            console.log(identification, identificationTypeId)
+            documentIdTypeSelect.value = identificationTypeId;
+            documentIdInput.value =  identification.trim();
+            documentIdInput.disabled = true;
+            documentIdTypeSelect.disabled = true;
+            findExistingUser();
+          }
+          
+        </script>
+        <script th:src="@{/js/location-phone-cascade.js}"></script>
+    </section>
+</body>
+</html>

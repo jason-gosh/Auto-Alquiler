@@ -1,0 +1,169 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: mainLayout(~{::content})}">
+<head>
+    <title>Mi Perfil e Historial</title>
+</head>
+<body>
+    <div th:fragment="content" class="space-y-8 max-w-5xl mx-auto">
+        <div class="border-b border-slate-800 pb-4">
+            <h1 class="text-xl font-black uppercase tracking-tight text-white">Mi Perfil e Historial</h1>
+            <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">
+                Configuración de datos legales y auditoría transaccional
+            </p>
+        </div>
+
+        <div th:if="${param.success}" class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl">
+            <p class="text-[10px] font-black uppercase text-emerald-400 tracking-widest">
+                Los datos de perfil han sido guardados exitosamente.
+            </p>
+        </div>
+
+        <div th:if="${param.error} or ${errorMessage}" class="bg-rose-500/10 border border-rose-500/20 p-4 rounded-xl space-y-1">
+            <p class="text-[10px] font-black uppercase text-rose-400 tracking-widest">Error al Procesar la Solicitud</p>
+            <p
+                class="text-xs text-slate-300 font-medium"
+                th:text="${errorMessage != null} ? ${errorMessage} : 'Ocurrió un fallo inesperado al guardar los datos.'"
+            ></p>
+        </div>
+
+        <div class="bg-[#1e293b] border border-slate-800 rounded-3xl p-6 shadow-xl">
+            <h2 class="text-xs font-black uppercase text-blue-400 tracking-widest mb-6">Información de Identidad Legal</h2>
+            <form th:action="@{/users/profile/save}" th:object="${userDetail}" method="post" class="space-y-6">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Tipo de Doc.</label>
+                        <select
+                            th:field="*{typeIdentification.id}"
+                            class="w-full bg-[#151f32] text-white text-xs font-bold rounded-xl p-3 border border-slate-700 outline-none focus:border-blue-500 cursor-pointer"
+                            required
+                        >
+                            <option value="">Seleccione su tipo de documento...</option>
+                            <option th:each="t : ${identifications}" th:value="${t.id}" th:text="${t.name}"></option>
+                        </select>
+                    </div>
+            
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Identificación</label>
+                        <input
+                            type="text"
+                            th:field="*{identification}"
+                            required
+                            class="w-full bg-[#151f32] text-white text-xs font-mono font-bold rounded-xl p-3 border border-slate-700 outline-none focus:border-blue-500"
+                        />
+                    </div>
+            
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Nombre Completo</label>
+                        <input
+                            type="text"
+                            th:field="*{name}"
+                            required
+                            class="w-full bg-[#151f32] text-white text-xs font-bold rounded-xl p-3 border border-slate-700 outline-none focus:border-blue-500"
+                        />
+                    </div>
+                </div>
+            
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest">País de Residencia</label>
+                        <select
+                            id="countrySelect"
+                            class="w-full bg-[#151f32] text-white text-xs font-bold rounded-xl p-3 border border-slate-700 outline-none focus:border-blue-500 cursor-pointer"
+                            th:field="*{country}"
+                            required
+                        >
+                            <option value="">-- Seleccione un País --</option>
+                            <option 
+                                th:each="c : ${countries}" 
+                                th:value="${{c}}"
+                                th:text="${c.country}"
+                                th:data-prefix="${c.postalNumber}"
+                            >        
+                            </option>
+                        </select>
+                    </div>
+            
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Departamento de Residencia</label>
+                        <select
+                            id="departmentSelect"
+                            name="department"
+                            class="w-full bg-[#151f32] text-white text-xs font-bold rounded-xl p-3 border border-slate-700 outline-none focus:border-blue-500 cursor-pointer transition-all duration-200 disabled:opacity-40 disabled:bg-[#111927] disabled:border-slate-800 disabled:cursor-not-allowed"
+                            required
+                            th:disabled="${#strings.isEmpty(preloadedDepartments)}"
+                        >
+                            <option value="" th:if="${#strings.isEmpty(preloadedDepartments)}">-- Seleccione primero un País --</option>
+                            <option value="" th:if="${!#strings.isEmpty(preloadedDepartments)}">-- Seleccione un Departamento --</option>
+                            <option th:each="d : ${preloadedDepartments}" 
+                                    th:value="${d}" 
+                                    th:text="${d}"
+                                    th:selected="${userDetail.location != null && d == userDetail.location.department}">
+                            </option>
+                        </select>
+                    </div>
+            
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Ciudad de Residencia</label>
+                        <select
+                            id="municipalitySelect"
+                            name="municipality"
+                            class="w-full bg-[#151f32] text-white text-xs font-bold rounded-xl p-3 border border-slate-700 outline-none focus:border-blue-500 cursor-pointer transition-all duration-200 disabled:opacity-40 disabled:bg-[#111927] disabled:border-slate-800 disabled:cursor-not-allowed"
+                            required
+                            th:disabled="${#strings.isEmpty(preloadedMunicipalities)}"
+                        >
+                            <option value="" th:if="${#strings.isEmpty(preloadedMunicipalities)}">-- Seleccione primero un Departamento --</option>
+                            <option value="" th:if="${!#strings.isEmpty(preloadedMunicipalities)}">-- Seleccione una Ciudad --</option>
+                            <option th:each="m : ${preloadedMunicipalities}" 
+                                    th:value="${m}" 
+                                    th:text="${m}"
+                                    th:selected="${userDetail.location != null && m == userDetail.location.municipality}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Dirección Residencial</label>
+                        <input class="w-full bg-[#151f32] text-white text-xs font-bold rounded-xl p-3 border border-slate-700 outline-none focus:border-blue-500"
+                            type="text"
+                            th:field="*{address}"
+                            required
+                        />
+                    </div>
+            
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Teléfono</label>
+                        <div class="flex rounded-xl overflow-hidden border border-slate-700 bg-[#151f32] focus-within:border-blue-500 transition-all">
+                            <span id="phonePrefix" class="flex items-center justify-center bg-[#1e293b] px-3 text-xs font-black text-slate-400 border-r border-slate-700 min-w-[55px] select-none">
+                                --
+                            </span>
+                            <input class="w-full bg-[#151f32] text-white text-xs font-bold rounded-xl p-3 outline-none"
+                                id="phoneInput"
+                                type="text"
+                                th:field="*{phone}"
+                                required
+                            />
+                        </div>
+                    </div>
+                </div> 
+                <div class="flex justify-start pt-2">
+                    <button
+                        type="submit"
+                        class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest px-6 py-3 rounded-xl transition-all active:scale-95"
+                    >
+                        Guardar Información
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="pt-4">
+            <div th:replace="~{layout/tables/reservation-table.html :: reservationsTable}"></div>
+        </div>
+        
+        <script th:src="@{/js/location-phone-cascade.js}"></script>
+    </div>
+</body>
+</html>

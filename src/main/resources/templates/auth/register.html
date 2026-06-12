@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: mainLayout(~{::section})}">
+<body>
+    <!-- Verificación de error manual -->
+    <div th:if="${error}" style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #f5c6cb;">
+        <span th:text="${error}">Mensaje de error</span>
+    </div>
+    
+    <!-- Verificación de errores de validación de Spring (@Valid) -->
+    <div th:if="${#fields.hasErrors('*')}" style="color: orange;">
+        <p>Hay errores en los campos del formulario.</p>
+    </div>
+    
+    <section>
+        <div class="max-w-md mx-auto bg-[#1e293b] border border-slate-800 p-10 rounded-3xl shadow-2xl mt-10">
+            <h2 class="text-xl font-black text-center mb-8 uppercase italic text-white">Registro de Usuario</h2>
+            <div th:if="${error}" class="bg-red-500/10 border border-red-500 text-red-500 p-3 rounded-xl mb-6 text-[10px] font-bold text-center uppercase" th:text="${error}"></div>
+
+            <form th:action="@{/auth/register}" th:object="${user}" method="post" class="space-y-5">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Nombre de Usuario</label>
+                    <input type="text" th:field="*{username}" class="w-full bg-[#0f172a] border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500" required />
+                    <p th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="text-red-500 text-[9px] mt-1 font-bold uppercase"></p>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Correo Electrónico</label>
+                    <input type="email" th:field="*{email}" class="w-full bg-[#0f172a] border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500" required />
+                    <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-red-500 text-[9px] mt-1 font-bold uppercase"></p>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">¿Cómo usarás la plataforma?</label>
+                        <select name="selectedRole" required 
+                                class="w-full bg-[#0f172a] border border-slate-800 rounded-xl px-3 py-2 text-white text-xs font-bold uppercase tracking-wider outline-none focus:border-blue-500 transition-all cursor-pointer">
+                            <option value="" disabled selected hidden>Selecciona un rol</option>
+                            
+                            <optgroup label="Quiero alquilar vehículos">
+                                <option value="ROLE_CLIENT">CLIENTE</option>
+                            </optgroup>
+                            
+                            <optgroup label="Quiero gestionar y publicar mi flota">
+                                <option value="ROLE_ADMIN">ADMINISTRADOR</option>
+                            </optgroup>
+                        </select>
+                </div>
+                
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Contraseña</label>
+                    <input type="password" th:field="*{password}" class="w-full bg-[#0f172a] border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500" required />
+                    <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="text-red-500 text-[9px] mt-1 font-bold uppercase"></p>
+                </div>
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 py-4 rounded-2xl font-black uppercase text-xs tracking-widest transition-all">
+                    Registrar Cuenta
+                </button>
+            </form>
+        </div>
+    </section>
+</body>
+</html>

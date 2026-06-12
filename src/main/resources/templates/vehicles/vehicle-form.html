@@ -1,0 +1,155 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: mainLayout(~{::section})}">
+<body>
+    <section>
+        <div class="max-w-4xl mx-auto bg-[#1e293b] border border-slate-800 p-10 rounded-3xl shadow-2xl mt-10">
+            <h2 class="text-xl font-black text-center mb-8 uppercase italic text-white tracking-tight" th:text="${title}"></h2>
+            <form th:action="@{/vehicles/save}" th:object="${vehicle}" method="post" class="space-y-6">
+                <input type="hidden" th:field="*{id}" />
+                <!-- BANNER DE ERROR AMIGABLE -->
+                <div
+                    th:if="${error}"
+                    class="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-xl mb-6 text-[10px] font-bold text-center uppercase tracking-widest"
+                >
+                    <span th:text="${error}"></span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Placa</label>
+                        <input
+                            type="text"
+                            th:field="*{plate}"
+                            class="w-full bg-[#0f172a] border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500 uppercase"
+                            oninput="this.value = this.value.toUpperCase()"
+                            required
+                            th:readonly="${vehicle.id != null}"
+                            placeholder="ej: XYZ789"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Tipo de Vehiculo</label>
+                        <select
+                            th:field="*{type}"
+                            class="w-full bg-[#0f172a] border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500"
+                            required
+                        >
+                            <option value="" class="bg-[#1e293b]">Seleccionar Tipo...</option>
+                            <option value="Bicicleta" class="bg-[#1e293b]">Bicicleta</option>
+                            <option value="Motocicleta" class="bg-[#1e293b]">Motocicleta</option>
+                            <option value="Carro" class="bg-[#1e293b]">Carro</option>
+                            <option value="Camioneta" class="bg-[#1e293b]">Camioneta</option>
+                            <option value="Camion" class="bg-[#1e293b]">Camion</option>
+                            <option value="Mula" class="bg-[#1e293b]">Mula</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div th:with="
+                    customSuffix='de Ubicación',
+                    customLabelClass='text-xs font-bold uppercase text-slate-500 tracking-wider',
+                    customInputClass='w-full bg-[#0f172a] text-slate-500 p-3 rounded-xl p-3 text-white border border-slate-700 outline-none focus:border-blue-500 cursor-pointer'" 
+                     th:remove="tag">
+                     
+                    <div th:replace="~{layout/selectors/location-phone-selectors :: renderCascadeSelectors('location.country.id', 'location.department', 'location.municipality', '', false)}"></div>
+                </div>
+ 
+                
+                <div class="grid grid-cols-1 gap-6">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Detalles Dirección</label>
+                        <input
+                            type="text"
+                            th:field="*{locationDetails}"
+                            class="w-full bg-[#0f172a] border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500"
+                            placeholder="Ej: Sede Norte"
+                        />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Marca</label>
+                        <input
+                            type="text"
+                            th:field="*{brand}"
+                            class="w-full bg-[#0f172a] border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Modelo</label>
+                        <input
+                            type="text"
+                            th:field="*{model}"
+                            class="w-full bg-[#0f172a] border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Año</label>
+                        <input
+                            type="number"
+                            th:field="*{year}"
+                            class="w-full bg-[#0f172a] border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500"
+                            required
+                        />
+                    </div>
+                    <div >
+                        <label class="text-[10px] font-black uppercase text-slate-500 tracking-widest block mb-2">Tarifa Diaria</label>
+                        <input
+                            type="text"
+                            th:field="*{dailyRate}"
+                            placeholder="Ej: 150000"
+                            maxlength="11"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                            class="w-full bg-[#0f172a] border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Estado</label>
+                        <select
+                            th:field="*{status}"
+                            class="w-full bg-[#0f172a] border border-slate-700 p-3 rounded-xl text-white outline-none focus:border-blue-500"
+                        >
+                            <option value="Disponible" class="bg-[#1e293b]">Disponible</option>
+                            <option value="Rentado" class="bg-[#1e293b]">Rentado</option>
+                            <option value="Mantenimiento" class="bg-[#1e293b]">Mantenimiento</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button
+                    type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-2xl font-black uppercase text-xs tracking-widest transition-all text-white mt-4"
+                >
+                    Guardar Vehículo
+                </button>
+            </form>
+        </div>
+        <script th:src="@{/js/location-phone-cascade.js}"></script>
+        <script th:inline="javascript">
+          document.addEventListener("DOMContentLoaded", function () {
+              
+              if (typeof window.hydrateLocationCascade === "function") {
+                window.hydrateLocationCascade({
+                  countryId: /*[[${vehicle?.location?.country?.id}]]*/ null,
+                  department: /*[[${vehicle?.location?.department}]]*/ null,
+                  municipality: /*[[${vehicle?.location?.municipality}]]*/ null,
+                  
+                  preloadedDepartments: /*[[${preloadedDepartments}]]*/ [], 
+                  preloadedMunicipalities: /*[[${preloadedMunicipalities}]]*/ []
+                });
+              } else {
+                  console.error("❌ Error: 'window.hydrateLocationCascade' no se ha cargado correctamente.");
+              }
+              
+          });
+        </script>
+    </section>
+</body>
+</html>

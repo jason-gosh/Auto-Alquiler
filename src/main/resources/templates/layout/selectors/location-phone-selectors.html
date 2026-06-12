@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+    <div th:fragment="renderCascadeSelectors(countryName, departmentName, municipalityName, phoneName, vertical)" th:remove="tag">
+        
+        <th:block th:with="
+            lblClass=${customLabelClass != null ? customLabelClass : 'text-[10px] font-black uppercase text-slate-500 tracking-widest'},
+            iptClass=${customInputClass != null ? customInputClass : 'w-full bg-[#151f32] text-white text-xs font-bold rounded-xl p-3 border border-slate-700 outline-none focus:border-blue-500 cursor-pointer disabled:opacity-40 disabled:bg-[#111927] disabled:border-slate-800 disabled:cursor-not-allowed'},
+            suffix=${customSuffix != null ? customSuffix : 'de Residencia'}">
+
+            <div class="grid gap-4 w-full" 
+                 th:classappend="${vertical} ? 'grid-cols-1' : (${phoneName != null && phoneName != ''} ? 'grid-cols-1 md:grid-cols-4' : 'grid-cols-1 md:grid-cols-3')">
+                
+                <div class="space-y-1">
+                    <label th:class="${lblClass}" th:text="'País ' + ${suffix}">País de Residencia</label>
+                    <select
+                        id="countrySelect"
+                        th:name="${countryName}"
+                        th:class="${iptClass}"
+                        required
+                    >
+                        <option value="">-- Seleccione un País --</option>
+                        <option th:each="c : ${countries}" 
+                            th:value="${c.id}"
+                            th:text="${c.country}"
+                            th:data-prefix="${c.postalNumber}"
+                            th:selected="${currentCountryId != null && c.id == currentCountryId}"
+                        >        
+                        </option>
+                    </select>
+                </div>
+        
+                <div class="space-y-1">
+                    <label th:class="${lblClass}" th:text="'Departamento ' + ${suffix}">Departamento de Residencia</label>
+                    <select
+                        id="departmentSelect"
+                        th:class="${iptClass}"
+                        th:name="${departmentName}"
+                        th:disabled="${#lists.isEmpty(preloadedDepartments)}"
+                        required
+                    >
+                        <option value="" th:if="${preloadedDepartments == null || #lists.isEmpty(preloadedDepartments)}">-- Seleccione primero un País --</option>
+                        <option value="" th:if="${preloadedDepartments != null && !#lists.isEmpty(preloadedDepartments)}">-- Seleccione un Departamento --</option>
+                        <option th:each="d : ${preloadedDepartments}" 
+                            th:value="${d}" 
+                            th:text="${d}"
+                            th:selected="${currentDepartment != null && d == currentDepartment}">
+                        </option>
+                    </select>
+                </div>
+        
+                <div class="space-y-1">
+                    <label th:class="${lblClass}" th:text="'Ciudad ' + ${suffix}">Ciudad de Residencia</label>
+                    <select
+                        id="municipalitySelect"
+                        th:class="${iptClass}"
+                        th:name="${municipalityName}"
+                        th:disabled="${#lists.isEmpty(preloadedMunicipalities)}"
+                        required
+                    >
+                        <option value="" th:if="${#lists.isEmpty(preloadedMunicipalities)}">-- Seleccione primero un Departamento --</option>
+                        <option value="" th:if="${!#lists.isEmpty(preloadedMunicipalities)}">-- Seleccione una Ciudad --</option>
+                        <option th:each="m : ${preloadedMunicipalities}" 
+                            th:value="${m}" 
+                            th:text="${m}"
+                            th:selected="${currentMunicipality != null && m == currentMunicipality}">
+                        </option>
+                    </select>
+                </div>
+        
+                <div class="space-y-1" th:if="${phoneName != null && phoneName != ''}">
+                    <label th:class="${lblClass}">Teléfono</label>
+                    <div class="flex rounded-xl overflow-hidden border border-slate-700 bg-[#151f32] focus-within:border-blue-500 transition-all">
+                        <span id="phonePrefix" class="flex items-center justify-center bg-[#1e293b] px-3 text-xs font-black text-slate-400 border-r border-slate-700 min-w-[55px] select-none">
+                            --
+                        </span>
+                        <input
+                            id="phoneInput"
+                            class="w-full bg-[#151f32] text-white text-xs font-bold rounded-xl p-3 outline-none disabled:opacity-40 disabled:bg-[#111927] disabled:border-slate-800 disabled:cursor-not-allowed"
+                            type="text"
+                            th:name="${phoneName}"
+                            th:value="${currentPhone != null ? currentPhone : ''}"
+                            th:required="${phoneName != null && phoneName != ''}"
+                        />
+                    </div>
+                </div>
+
+            </div>
+        </th:block>
+
+        <script th:inline="javascript">
+            (function() {
+                const countrySel = document.getElementById("countrySelect");
+                const prefixBox = document.getElementById("phonePrefix");
+                if (countrySel && prefixBox) {
+                    function syncPrefix() {
+                        const selectedOption = countrySel.options[countrySel.selectedIndex];
+                        const prefix = selectedOption ? selectedOption.getAttribute("data-prefix") : null;
+                        prefixBox.textContent = prefix ? prefix : "--";
+                    }
+                    countrySel.addEventListener("change", syncPrefix);
+                    syncPrefix();
+                }
+            })();
+        </script>
+    </div>
+
+</body>
+</html>

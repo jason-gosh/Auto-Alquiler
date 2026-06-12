@@ -1,0 +1,110 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <div th:fragment="reservationsTable" class="bg-[#1e293b] border border-slate-800 rounded-3xl p-6 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-slate-800 pb-5 mb-6 gap-3">
+            <div>
+                <h2 class="text-xs font-black uppercase text-emerald-400 tracking-widest">Historial de Reservaciones</h2>
+                <p class="text-[11px] text-slate-400 mt-0.5">Auditoría de contratos y pasarelas de pago asociadas.</p>
+            </div>
+            <div>
+                <span class="inline-block bg-[#151f32] border border-slate-700 text-slate-300 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl"
+                    th:text="${reservationsHist != null ? #lists.size(reservationsHist) : 0} + ' Registros'"></span>
+            </div>
+        </div>
+        
+        <div th:if="${reservationsHist == null || #lists.isEmpty(reservationsHist)}" 
+            class="bg-[#151f32]/40 border border-slate-800/80 rounded-2xl p-8 text-center text-slate-400 space-y-3">
+                <i class="fas fa-folder-open text-3xl text-slate-600"></i>
+                <p class="text-xs font-medium max-w-md mx-auto">No se encontraron registros de reservas históricas en el sistema para este perfil.</p>
+            </div>
+            
+            <div th:unless="${reservationsHist == null || #lists.isEmpty(reservationsHist)}" class="overflow-x-auto selection:bg-emerald-500/30">
+                <table class="w-full border-collapse text-left">
+                    <thead>
+                        <tr class="border-b border-slate-800 text-[10px] font-black uppercase text-slate-400 tracking-widest bg-[#151f32]/20">
+                            <th class="py-4 px-4">Contrato</th>
+                            <th class="py-4 px-4">Vehículo Asignado</th>
+                            <th class="py-4 px-4">Fechas de Reserva</th>
+                            <th class="py-4 px-4">Ubicación / Lugar</th>
+                            <th class="py-4 px-4 text-right">Monto Total</th>
+                            <th class="py-4 px-4 text-center">Estado</th>
+                            <th class="py-4 px-4 text-center">Auditoría Pago</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/70 text-xs text-slate-300">
+                        <tr th:each="res : ${reservationsHist}" class="hover:bg-[#151f32]/30 transition-colors duration-150">
+                            
+                            <td class="py-4 px-4 font-mono font-bold text-slate-200" th:text="${res.contractNumber}"></td>
+                            
+                            <td class="py-4 px-4">
+                                <div th:if="${res.vehicleHist != null}" class="space-y-0.5">
+                                    <span class="block font-bold text-slate-200" 
+                                        th:text="${(res.vehicleHist.brand ?: 'Sin Marca') + ' ' + (res.vehicleHist.model ?: 'Sin Modelo')}"></span>
+                                    <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider" 
+                                        th:text="'Tipo: ' + ${(res.vehicleHist.type ?: 'N/A')}"></span>
+                                </div>
+                                <span th:unless="${res.vehicleHist != null}" class="text-slate-500 italic font-medium">Vehículo no indexado</span>
+                            </td>
+                            
+                            <td class="py-4 px-4 font-medium whitespace-nowrap">
+                                <span th:text="${res.startDate ?: '---'}"></span>
+                                <i class="fas fa-arrow-right mx-1.5 text-slate-600 text-[10px]"></i>
+                                <span th:text="${res.endDate ?: '---'}"></span>
+                            </td>
+                            
+                            <td class="py-4 px-4 font-medium text-slate-400" 
+                                th:text="${res.vehicleHist != null ? ( (res.vehicleHist.location.department+' / '+res.vehicleHist.location.municipality) ?: 'No especificada') : 'N/A'}"></td>
+                            
+                            <td class="py-4 px-4 text-right font-mono font-bold text-emerald-400">
+                                <span th:if="${res.totalPrice != null}" 
+                                    th:text="'$' + ${#numbers.formatDecimal(res.totalPrice, 1, 'POINT', 0, 'COMMA')}"></span>
+                                <span th:unless="${res.totalPrice != null}">$0.00</span>
+                            </td>
+
+                            <td class="py-4 px-4 text-right whitespace-nowrap">
+                                <span th:if="${res.status.name() == 'PENDING'}" 
+                                      class="inline-flex items-center justify-center bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md">
+                                    PENDIENTE
+                                </span>
+                                <span th:if="${res.status.name() == 'ACTIVE'}" 
+                                      class="inline-flex items-center justify-center bg-sky-500/10 border border-sky-500/20 text-sky-400 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md">
+                                    EN CURSO
+                                </span>
+                                <span th:if="${res.status.name() == 'COMPLETED'}" 
+                                      class="inline-flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md">
+                                    COMPLETADA
+                                </span>
+                                <span th:if="${res.status.name() == 'EXPIRED'}" 
+                                      class="inline-flex items-center justify-center bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md">
+                                    EXPIRADA
+                                </span>
+                                <span th:if="${res.status.name() == 'VOIDED'}" 
+                                      class="inline-flex items-center justify-center bg-slate-500/10 border border-slate-500/20 text-slate-400 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md">
+                                    ANULADA
+                                </span>
+                            </td>
+                            
+                            <td class="py-4 px-4 text-center whitespace-nowrap">
+                                <div th:if="${res.paymentHist != null}">
+                                    <span th:if="${res.paymentHist.status == 'CONFIRMED'}"
+                                        class="inline-flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md"
+                                        th:text="${res.paymentHist.amount}">
+                                    </span>
+                                    <span th:if="${res.paymentHist.status != 'CONFIRMED'}"
+                                        class="inline-flex items-center justify-center bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md"
+                                        th:text="${res.paymentHist.status ?: 'PENDIENTE'}">        
+                                    </span>
+                                </div>
+                                <span th:unless="${res.paymentHist != null}" 
+                                    class="inline-flex items-center justify-center bg-slate-800 border border-slate-700 text-slate-400 text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md">
+                                        SIN REGISTRO
+                                </span>
+                            </td>
+                            
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+    </div>
+</html>

@@ -1,0 +1,113 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: mainLayout(~{::section})}">
+<body>
+    <section>
+        <div class="max-w-3xl mx-auto bg-[#1e293b] border border-slate-800 p-8 rounded-3xl shadow-2xl mt-10">
+            
+            <div th:if="${error}" class="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-xl mb-8 text-[10px] font-bold text-center uppercase tracking-widest">
+                <span th:text="${error}"></span>
+            </div>
+
+            <div class="flex justify-between items-center mb-8 border-b border-slate-800 pb-6">
+                <div>
+                    <h2 class="text-xl font-black uppercase italic text-white tracking-tight">Transacciones de Reservaciones</h2>
+                    <p class="text-slate-500 text-[10px] uppercase font-bold tracking-widest mt-1">Control de Pago Manual</p>
+                </div>
+                <a th:href="@{/admin/dashboard}" class="px-6 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all text-slate-400">
+                    Regresar al Panel
+                </a>
+            </div>
+
+            <div class="bg-[#0f172a]/60 p-6 rounded-2xl border border-slate-800 mb-8 grid grid-cols-2 gap-4">
+                <div>
+                    <span class="text-slate-500 text-[9px] uppercase font-bold tracking-wider block">Código Reserva</span>
+                    <span class="text-white font-mono font-bold" th:text="'#' + ${reservation.contractNumber}"></span>
+                </div>
+                <div>
+                    <span class="text-slate-500 text-[9px] uppercase font-bold tracking-wider block">Cliente</span>
+                    <span class="text-slate-200 font-bold" th:text="${reservation.client.detail.name}"></span>
+                </div>
+                <div>
+                    <span class="text-slate-500 text-[9px] uppercase font-bold tracking-wider block">Vehículo Solicitado</span>
+                    <span class="text-blue-400 font-bold uppercase tracking-tight" th:text="${reservation.vehicle.brand + ' ' + reservation.vehicle.model}"></span>
+                </div>
+                <div>
+                    <span class="text-slate-500 text-[9px] uppercase font-bold tracking-wider block">Tope Máximo Permitido</span>
+                    <span class="text-green-400 font-black" th:text="'$' + ${#numbers.formatInteger(reservation.totalAmount, 1, 'POINT')}"></span>
+                </div>
+            </div>
+
+            <form th:action="@{/admin/payment/save}" method="post" class="space-y-6">
+                <input type="hidden" name="reservationId" th:value="${reservation.id}"/>
+
+                <div>
+                    <label for="amount" class="text-slate-400 text-[10px] uppercase font-black tracking-widest block mb-2">Monto Recaudado ($)</label>
+                    <input type="text" id="amount" name="amount" th:value="${payment.amount}" 
+                           class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-4 py-3 text-white font-bold outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
+                           oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                           required min="0" autocomplete="off"/>
+                    <p class="text-slate-500 text-[9px] mt-1 uppercase font-bold tracking-wide">Digitar montos exactos sin puntos ni comas.</p>
+                </div>
+
+                <div>
+                    <label for="paymentMethodId" class="text-slate-400 text-[10px] uppercase font-black tracking-widest block mb-2">Canal / Método de Pago</label>
+                    <select id="paymentMethodId" name="paymentMethodId" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-4 py-3 text-white font-bold outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                        <option th:each="method : ${paymentMethods}" 
+                                th:value="${method.id}" 
+                                th:text="${#strings.toUpperCase(method.name)}"
+                                th:selected="${payment.paymentMethod != null && payment.paymentMethod.id == method.id}">
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="status" class="text-slate-400 text-[10px] uppercase font-black tracking-widest block mb-2">Estado de Verificación</label>
+                    <select id="status" name="status" class="w-full bg-[#0f172a] border border-slate-700 rounded-xl px-4 py-3 text-white font-bold outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                        <option th:each="st : ${statuses}" 
+                                th:value="${st}" 
+                                th:text="${st == T(com.json.AutoAlquiler.models.PaymentStatus).PENDING ? 'PENDIENTE' : (st == T(com.json.AutoAlquiler.models.PaymentStatus).CONFIRMED ? 'CONFIRMADO' : 'RECHAZADO')}"
+                                th:selected="${st == payment.status}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-black uppercase text-[11px] tracking-widest transition-all text-white shadow-lg shadow-blue-500/10">
+                        Aplicar y Sincronizar Pago
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <script th:inline="javascript">
+            document.addEventListener("DOMContentLoaded", function() {
+                const amountInput = document.getElementById("amount");
+                const statusSelect = document.getElementById("status");
+                
+                // Obtenemos el tope máximo directamente desde Thymeleaf de forma segura
+                const totalAmount = /*[[${reservation.totalAmount}]]*/ 0;
+        
+                function evaluarMonto() {
+                    const montoDigitado = parseFloat(amountInput.value) || 0;
+        
+                    if (montoDigitado >= totalAmount) {
+                        // Forzar el valor visual y técnico a CONFIRMADO
+                        statusSelect.value = "CONFIRMED";
+                        // Bloquear la interacción simulando un disabled pero permitiendo el POST
+                        statusSelect.classList.add("pointer-events-none", "opacity-60", "bg-slate-900");
+                    } else {
+                        // Liberar el control si el administrador reduce el monto
+                        statusSelect.classList.remove("pointer-events-none", "opacity-60", "bg-slate-900");
+                    }
+                }
+        
+                // Escuchar en tiempo real mientras el administrador digita
+                amountInput.addEventListener("input", evaluarMonto);
+                
+                // Ejecutar al cargar la página por si ya viene pre-completado
+                evaluarMonto();
+            });
+        </script>
+    </section>
+</body>
+</html>

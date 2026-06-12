@@ -1,0 +1,36 @@
+<configuration>
+    <property name="LOG_PATH" value="logs" />
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${LOG_PATH}/app_errors.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%cyan(%d{HH:mm:ss}) %magenta([%thread]) %highlight(%-5level) %yellow(%logger{36}) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SQLITE_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${LOG_PATH}/autoalquiler_sqlite.errors.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <logger name="sqlite.errors" level="ERROR" additivity="false">
+        <appender-ref ref="SQLITE_FILE" />
+    </logger>
+
+    <!-- Solo los errores de código irán al archivo de log -->
+    <logger name="com.json.AutoAlquiler" level="DEBUG">
+        <appender-ref ref="FILE" />
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>
