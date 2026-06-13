@@ -41,7 +41,7 @@ INSERT OR IGNORE INTO countries (id, country, postal_number) VALUES
 (34, 'Finlandia', '358'), (35, 'Francia', '33'), (36, 'Grecia', '30'), (37, 'Hungría', '36'), (38, 'Irlanda', '353'), 
 (39, 'Islandia', '354'), (40, 'Italia', '39'), (41, 'Letonia', '371'), (42, 'Lituania', '370'), (43, 'Luxemburgo', '352'), 
 (44, 'Malta', '356'), (45, 'Noruega', '47'), (46, 'Países Bajos', '31'), (47, 'Polonia', '48'), (48, 'Portugal', '351'), 
-(49, 'Reino Unido', '44'), (50, 'República Checa', '420'), (51, 'Rumania', '40'), (52, 'Rusia', '7'), (53, 'Suecia', '46'), 
+(49, 'Reino Unido', '44'), (50, 'República Checa', '420'), (51, 'Rumania', '40'), (53, 'Suecia', '46'), 
 (54, 'Suiza', '41'), (55, 'Ucrania', '380'),
 (56, 'Arabia Saudita', '966'), (57, 'China', '86'), (58, 'Corea del Sur', '82'), (59, 'Emiratos Árabes Unidos', '971'), 
 (60, 'Filipinas', '63'), (61, 'India', '91'), (62, 'Indonesia', '62'), (63, 'Israel', '972'), (64, 'Japón', '81'), 

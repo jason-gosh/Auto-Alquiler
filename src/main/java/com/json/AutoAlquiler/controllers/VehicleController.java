@@ -72,14 +72,9 @@ public class VehicleController {
               )
             : List.of();
 
-        System.out.println("Listas: [munis] -> "+preloadedMunis.toString()+" [depts] -> "+preloadedDeps);
-
         model.addAttribute("title", "Editar Vehículo");
         model.addAttribute("locations", locationService.findAllByOrderByDepartmentAscMunicipalityAsc());
         model.addAttribute("countries", countryService.findAll());  
-        model.addAttribute("countryId", vehicle.getLocation().getCountry().getId());  
-        model.addAttribute("department", vehicle.getLocation().getDepartment());
-        model.addAttribute("municipality", vehicle.getLocation().getMunicipality());
         model.addAttribute("preloadedDepartments", preloadedDeps);
         model.addAttribute("preloadedMunicipalities", preloadedMunis);
         model.addAttribute("vehicle", vehicle);
