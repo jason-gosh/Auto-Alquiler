@@ -2,6 +2,7 @@ package com.json.AutoAlquiler.controllers;
 
 import com.json.AutoAlquiler.models.Reservation;
 import com.json.AutoAlquiler.services.CatalogService;
+import com.json.AutoAlquiler.services.CountryService;
 import com.json.AutoAlquiler.services.LocationService;
 import com.json.AutoAlquiler.services.ReservationService;
 import java.time.LocalDate;
@@ -21,8 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/catalog")
 public class CatalogController {
 
-    private final CatalogService catalogService;
     private final LocationService locationService;
+    private final CountryService countryService;
+    private final CatalogService catalogService;
     private final ReservationService reservationService;
 
     @ModelAttribute("todayDate") // Se invoca en cualquier petición a este controlador
@@ -41,6 +43,8 @@ public class CatalogController {
         Authentication authentication,
         Model model
     ) {
+        model.addAttribute("locations", locationService.findAllByOrderByDepartmentAscMunicipalityAsc());
+        model.addAttribute("countries", countryService.findAll());
         if (startDate == null && endDate == null) {
             model.addAttribute("vehicles", List.of());
             return "catalog/catalog-available-vehicles";
@@ -48,9 +52,8 @@ public class CatalogController {
 
         try {
             model.addAttribute("reservationId", reservationId);
-            model.addAttribute("locations", locationService.findAll());
             model.addAttribute("vehicles", catalogService.getAvailableVehicles(startDate, endDate, locationId, type, maxPrice));
-            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA -> "+catalogService.getAvailableVehicles(startDate, endDate, locationId, type, maxPrice));
+            System.out.println(" -> "+catalogService.getAvailableVehicles(startDate, endDate, locationId, type, maxPrice));
         } catch (IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("vehicles", List.of());

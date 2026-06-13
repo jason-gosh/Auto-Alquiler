@@ -3,13 +3,21 @@
 <body>
     <section class="max-w-7xl mx-auto mt-10 p-4">
         
+        <div id="locationsBridge" style="display: none;">
+            <div th:each="loc : ${locations}"
+                 th:data-id="${loc.id}"
+                 th:data-department="${loc.department}"
+                 th:data-municipality="${loc.municipality}">
+            </div>
+        </div>
+        
         <div class="mb-8">
             <h1 class="text-3xl font-black text-white italic tracking-tighter"
-                th:text="${reservationId != null} ? 'CAMBIAR VEHÍCULO DE LA RESERVA' : 'FLOTA DISPONIBLE'">
+                th:text="${reservationId != null ? 'CAMBIAR VEHÍCULO DE LA RESERVA' : 'FLOTA DISPONIBLE'}">
                 FLOTA DISPONIBLE
             </h1>
             <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1"
-               th:text="${reservationId != null} ? 'Selecciona un nuevo vehículo para cubrir el rango de fechas contratado' : 'Encuentra y reserva tu vehículo ideal'">
+               th:text="${reservationId != null ? 'Selecciona un nuevo vehículo para cubrir el rango de fechas contratado' : 'Encuentra y reserva tu vehículo ideal'}">
                 Encuentra y reserva tu vehículo ideal
             </p>
         </div>
@@ -20,7 +28,7 @@
                 <div class="bg-[#1e293b] border border-slate-800 p-6 rounded-3xl sticky top-6">
                     <div class="flex justify-between items-center mb-6 gap-2">
                         <h3 class="text-white text-[10px] font-black uppercase tracking-widest m-0"
-                            th:text="${reservationId != null} ? 'Reserva en Modificación: #' + ${reservationId} : 'Filtros de Búsqueda'">
+                            th:text="${reservationId != null ? 'Reserva en Modificación: #' + reservationId : 'Filtros de Búsqueda'}">
                             Filtros de Búsqueda
                         </h3>
                         
@@ -29,23 +37,23 @@
                             Mis Reservas
                         </a>
                     </div>
+                    
                     <form th:action="@{/catalog}" method="get" class="space-y-4">
                         <input type="hidden" name="reservationId" th:if="${reservationId != null}" th:value="${reservationId}">
+                        <input type="hidden" id="catalogLocationId" name="locationId" th:value="${param.locationId != null ? param.locationId[0] : ''}">
 
                         <div>
                             <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest block mb-1">Recogida</label>
                             <input type="date" id="startDate" name="startDate" th:value="${param.startDate}" 
                                    th:disabled="${reservationId != null}"
-                                   th:min="${todayDate}"
                                    th:classappend="${reservationId != null} ? 'opacity-50 cursor-not-allowed bg-[#0f172a]/50' : ''"
                                    class="w-full bg-[#0f172a] border border-slate-800 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-blue-500 transition-all" required>
-                            <input type="hidden" name="startDate" th:if="${reservationId != null}" th:value="${param.startDate}" >
+                            <input type="hidden" name="startDate" th:if="${reservationId != null}" th:value="${param.startDate}">
                         </div>
                         <div>
                             <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest block mb-1">Devolución</label>
                             <input type="date" id="endDate" name="endDate" th:value="${param.endDate}" 
                                    th:disabled="${reservationId != null}"
-                                   th:min="${todayDate}"
                                    th:classappend="${reservationId != null} ? 'opacity-50 cursor-not-allowed bg-[#0f172a]/50' : ''"
                                    class="w-full bg-[#0f172a] border border-slate-800 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-blue-500 transition-all" required>
                             <input type="hidden" name="endDate" th:if="${reservationId != null}" th:value="${param.endDate}">
@@ -59,23 +67,25 @@
                                 <option value="">Todos los tipos</option>
                                 <option value="Bicicleta" th:selected="${param.type == 'Bicicleta'}" class="bg-[#1e293b]">Bicicleta</option>
                                 <option value="Motocicleta" th:selected="${param.type == 'Motocicleta'}" class="bg-[#1e293b]">Motocicleta</option>
-                                <option value="Carro" th:selected="${param.type == 'Carro'}"  class="bg-[#1e293b]">Carro</option>
-                                <option value="Camioneta" th:selected="${param.type == 'Camioneta'}"  class="bg-[#1e293b]">Camioneta</option>
-                                <option value="Camion" th:selected="${param.type == 'Camion'}"  class="bg-[#1e293b]">Camion</option>
-                                <option value="Mula" th:selected="${param.type == 'Mula'}"  class="bg-[#1e293b]">Mula</option>
+                                <option value="Carro" th:selected="${param.type == 'Carro'}" class="bg-[#1e293b]">Carro</option>
+                                <option value="Camioneta" th:selected="${param.type == 'Camioneta'}" class="bg-[#1e293b]">Camioneta</option>
+                                <option value="Camion" th:selected="${param.type == 'Camion'}" class="bg-[#1e293b]">Camion</option>
+                                <option value="Mula" th:selected="${param.type == 'Mula'}" class="bg-[#1e293b]">Mula</option>
                             </select>
                         </div>
-                        <div>
-                            <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest block mb-1">Localización</label>
-                            <select name="locationId" class="w-full bg-[#0f172a] border border-slate-800 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-blue-500 transition-all">
-                                <option value="">Cualquier Localización</option>
-                                <option th:each="loc : ${locations}" th:value="${loc.id}" th:text="${loc.department + ' - ' + loc.municipality}" th:selected="${param.locationId != null and param.locationId.toString() == loc.id.toString()}"></option>
-                            </select>
+
+                        <div th:with="
+                            customSuffix='de Ubicación',
+                            customLabelClass='text-[9px] font-black uppercase text-slate-500 tracking-widest block mb-1',
+                            customInputClass='w-full bg-[#0f172a] border border-slate-800 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-blue-500'" 
+                            th:remove="tag"
+                        >
+                            <div th:replace="~{layout/selectors/location-phone-selectors :: renderCascadeSelectors('location.country.id', 'location.department', 'location.municipality', '', true, false)}"></div>
                         </div>
 
                         <div>
                             <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest block mb-1">Presupuesto Máx / Día</label>
-                            <input type="text" id="maxPrice" name="maxPrice" th:value="${param.maxPrice}" min="0" max="99999999999" placeholder="Ej: 200000" class="w-full bg-[#0f172a] border border-slate-800 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-blue-500 transition-all">
+                            <input type="text" id="maxPrice" name="maxPrice" th:value="${param.maxPrice}" placeholder="Ej: 200000" class="w-full bg-[#0f172a] border border-slate-800 rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-blue-500 transition-all">
                         </div>
 
                         <button type="submit" class="w-full mt-6 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase text-[10px] py-3 rounded-xl transition-all tracking-widest shadow-lg shadow-blue-500/10">
@@ -86,7 +96,6 @@
             </div>
 
             <div class="lg:col-span-3">
-                
                 <div th:if="${error}" class="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-xl mb-6 text-[10px] font-bold text-center uppercase tracking-widest" th:text="${error}"></div>
 
                 <div th:if="${#lists.isEmpty(vehicles)}" class="bg-[#1e293b] border border-slate-800 p-10 rounded-3xl text-center">
@@ -118,13 +127,13 @@
                                 <a th:if="${reservationId != null}"
                                    th:href="@{/reservations/initProcess/{id}(id=${v.id}, startDate=${param.startDate}, endDate=${param.endDate}, reservationId=${param.reservationId})}"
                                    class="bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase text-[9px] px-4 py-2 rounded-lg transition-colors tracking-widest">
-                                    Asignar a Reserva
+                                     Asignar a Reserva
                                 </a>
                             
                                 <a th:unless="${reservationId != null}"
                                    th:href="@{/vehicles/details/{id}(id=${v.id}, source='catalog', startDate=${param.startDate}, endDate=${param.endDate})}"
                                    class="bg-white text-slate-900 hover:bg-slate-200 font-black uppercase text-[9px] px-4 py-2 rounded-lg transition-colors tracking-widest">
-                                    Ver y Reservar
+                                     Ver y Reservar
                                 </a>
                             </div>
                         </div>
@@ -133,34 +142,90 @@
             </div>
         </div>
 
-        <script th:inline="javascript">
+        <script>
             document.addEventListener('DOMContentLoaded', function() {
-              const isEditing = /*[[${reservationId != null}]]*/ false;    
-              if(!isEditing) {
+                // Extraemos los elementos del DOM generados de forma nativa e independiente por Thymeleaf
+                const locationsList = [];
+                document.querySelectorAll('#locationsBridge > div').forEach(function(el) {
+                    locationsList.push({
+                        id: el.getAttribute('data-id'),
+                        department: el.getAttribute('data-department'),
+                        municipality: el.getAttribute('data-municipality')
+                    });
+                });
+
+                // Validación limpia usando strings puros del DOM sin inyecciones in-line peligrosas
+                const maxPriceInput = document.getElementById('maxPrice');
+                if (maxPriceInput) {
+                    maxPriceInput.addEventListener('input', function() {
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                        if (this.value !== '' && BigInt(this.value) > 99999999999n) {
+                            this.value = '99999999999';
+                        }
+                    });
+                }
+
+                // Control de fechas locales dinámicas
                 const startDateInput = document.getElementById('startDate');
                 const endDateInput = document.getElementById('endDate');
+                
+                // Verificamos si no estamos editando comprobando si el input no está deshabilitado por el backend
+                const isNotEditing = startDateInput && !startDateInput.disabled;
 
-                startDateInput.addEventListener('change', function() {
-                  if (startDateInput.value) {
-                    endDateInput.min = startDateInput.value;
-                    if (endDateInput.value && endDateInput.value < startDateInput.value) {
-                      endDateInput.value = startDateInput.value;
-                    }
-                  } else {
-                    endDateInput.min = /*[[${todayDate}]]*/ '';
-                  }
-                });
-              }
+                if (isNotEditing && startDateInput && endDateInput) {
+                    const today = new Date().toISOString().split('T')[0];
+                    startDateInput.min = today;
+                    endDateInput.min = today;
 
-                const maxPriceInput = document.getElementById('maxPrice');
-                maxPriceInput.addEventListener('input', function() {
-                    this.value = this.value.replace(/[^0-9]/g, '');
-                    if (this.value !== '' && BigInt(this.value) > 99999999999n) {
-                        this.value = '99999999999';
+                    startDateInput.addEventListener('change', function() {
+                        if (startDateInput.value) {
+                            endDateInput.min = startDateInput.value;
+                            if (endDateInput.value && endDateInput.value < startDateInput.value) {
+                                endDateInput.value = startDateInput.value;
+                            }
+                        } else {
+                            endDateInput.min = today;
+                        }
+                    });
+                }
+
+                // --- RESOLUCIÓN DINÁMICA DE UBICACIÓN ---
+                const countrySel = document.querySelector('[name="location.country.id"]') || document.getElementById('location.country.id');
+                const deptSel = document.querySelector('[name="location.department"]') || document.getElementById('location.department');
+                const muniSel = document.querySelector('[name="location.municipality"]') || document.getElementById('location.municipality');
+                const hiddenLocationInput = document.getElementById('catalogLocationId');
+
+                function syncLocationId() {
+                    if (!deptSel || !muniSel || !hiddenLocationInput) return;
+                    
+                    const selectedDept = deptSel.value;
+                    const selectedMuni = muniSel.value;
+
+                    if (!selectedDept || !selectedMuni) {
+                        hiddenLocationInput.value = '';
+                        return;
                     }
-                });
+
+                    const matchedLocation = locationsList.find(loc => {
+                        return loc.department?.toString().trim().toLowerCase() === selectedDept.toString().trim().toLowerCase() &&
+                               loc.municipality?.toString().trim().toLowerCase() === selectedMuni.toString().trim().toLowerCase();
+                    });
+
+                    if (matchedLocation) {
+                        hiddenLocationInput.value = matchedLocation.id;
+                    } else {
+                        hiddenLocationInput.value = '';
+                    }
+                }
+
+                if (muniSel) muniSel.addEventListener('change', syncLocationId);
+                if (deptSel) deptSel.addEventListener('change', syncLocationId);
+                if (countrySel) countrySel.addEventListener('change', syncLocationId);
+
+                setTimeout(syncLocationId, 250);
             });
         </script>
+        <script th:src="@{/js/location-phone-cascade.js}"></script>
     </section>
 </body>
 </html>

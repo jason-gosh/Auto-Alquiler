@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
-    <div th:fragment="renderCascadeSelectors(countryName, departmentName, municipalityName, phoneName, vertical)" th:remove="tag">
+    <div th:fragment="renderCascadeSelectors(countryName, departmentName, municipalityName, phoneName, vertical, isRequired)" th:remove="tag">
         
         <th:block th:with="
             lblClass=${customLabelClass != null ? customLabelClass : 'text-[10px] font-black uppercase text-slate-500 tracking-widest'},
@@ -18,7 +18,7 @@
                         id="countrySelect"
                         th:name="${countryName}"
                         th:class="${iptClass}"
-                        required
+                        th:required="${isRequired}"
                     >
                         <option value="">-- Seleccione un País --</option>
                         <option th:each="c : ${countries}" 
@@ -38,7 +38,7 @@
                         th:class="${iptClass}"
                         th:name="${departmentName}"
                         th:disabled="${#lists.isEmpty(preloadedDepartments)}"
-                        required
+                        th:required="${isRequired}"
                     >
                         <option value="" th:if="${preloadedDepartments == null || #lists.isEmpty(preloadedDepartments)}">-- Seleccione primero un País --</option>
                         <option value="" th:if="${preloadedDepartments != null && !#lists.isEmpty(preloadedDepartments)}">-- Seleccione un Departamento --</option>
@@ -57,7 +57,7 @@
                         th:class="${iptClass}"
                         th:name="${municipalityName}"
                         th:disabled="${#lists.isEmpty(preloadedMunicipalities)}"
-                        required
+                        th:required="${isRequired}"
                     >
                         <option value="" th:if="${#lists.isEmpty(preloadedMunicipalities)}">-- Seleccione primero un Departamento --</option>
                         <option value="" th:if="${!#lists.isEmpty(preloadedMunicipalities)}">-- Seleccione una Ciudad --</option>

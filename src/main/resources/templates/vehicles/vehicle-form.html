@@ -49,9 +49,9 @@
                     customSuffix='de Ubicación',
                     customLabelClass='text-xs font-bold uppercase text-slate-500 tracking-wider',
                     customInputClass='w-full bg-[#0f172a] text-slate-500 p-3 rounded-xl p-3 text-white border border-slate-700 outline-none focus:border-blue-500 cursor-pointer'" 
-                     th:remove="tag">
-                     
-                    <div th:replace="~{layout/selectors/location-phone-selectors :: renderCascadeSelectors('location.country.id', 'location.department', 'location.municipality', '', false)}"></div>
+                     th:remove="tag"
+                >         
+                    <div th:replace="~{layout/selectors/location-phone-selectors :: renderCascadeSelectors('location.country.id', 'location.department', 'location.municipality', '', false, true)}"></div>
                 </div>
  
                 
