@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Ignorar el ejecutable compilado del backend de Spring Boot
+src-tauri/resources/backend.jar
+
+# Ignorar el entorno de ejecución de Java (JRE) local del sistema operativo
+src-tauri/resources/jre/
+
+# Asegurar que la carpeta de compilación de Rust esté completamente fuera de Git
+src-tauri/target/

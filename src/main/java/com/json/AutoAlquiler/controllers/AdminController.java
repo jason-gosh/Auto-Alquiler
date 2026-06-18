@@ -73,7 +73,7 @@ public class AdminController {
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         } catch (Exception e) {
-            System.out.println("Error crítico al cargar el pago causado por: " + e.getMessage());
+            System.out.println("🚨Error crítico al cargar el pago causado por: " + e.getMessage());
             redirectAttributes.addFlashAttribute("error", "No se pudo procesar el pago para la reservación");
         }
         return "redirect:/admin/dashboard";
