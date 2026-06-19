@@ -36,9 +36,9 @@ Antes de intentar compilar el proyecto, asegúrate de tener instaladas las sigui
 
 #### En Linux (Distribuciones basadas en Arch/Ubuntu):
 Debes instalar las herramientas de desarrollo esenciales y las librerías de desarrollo webkit de GTK:
-  ```bash
+```bash
   $ sudo pacman -S --needed base-devel curl wget file openssl appmenu-gtk-module libappindicator-gtk3 webkit2gtk-4.1
-  ```
+```
 
 En Windows:
 
@@ -160,7 +160,7 @@ AutoAlquiler/                     <-- Raíz del Proyecto (Contexto Spring Boot)
             ├── backend.jar       <-- Archivo compilado de Spring Boot
             └── jre/              <-- JRE modularizado exclusivo para la ejecución local
 ```
-
+---
 ## 🛠️ Solución de Problemas Comunes (Troubleshooting)
 
 ### 1. Error: `Connection Refused` en la ventana de la aplicación

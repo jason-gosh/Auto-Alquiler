@@ -1,0 +1,35 @@
+/* =====================================================================
+   NORMALIZACIÓN GLOBAL PARA NAUFRAGIO DE NAVEGADORES Y WEBVIEWS (TAURI)
+   ===================================================================== */
+
+/* 1. Forzar que todos los elementos calculen su tamaño de la misma forma */
+*, ::before, ::after {
+    box-sizing: border-box;
+}
+
+/* 2. Estandarizar los componentes SELECT de HTML para que ignoren el SO */
+select {
+    -webkit-appearance: none;  /* Desactiva estilos nativos en WebKit (Tauri Linux/Mac) */
+    -moz-appearance: none;     /* Desactiva estilos nativos en Firefox */
+    appearance: none;          /* Regla estándar (Tauri Windows) */
+    
+    /* Agrega un indicador visual propio para la flecha (opcional, ajusta a tu diseño) */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px; /* Espacio para que el texto no pise la flecha */
+    cursor: pointer;
+}
+
+/* 3. Forzar colores oscuros uniformes en las opciones del select */
+select option {
+    background-color: #151f32 !important;
+    color: #ffffff !important;
+    padding: 10px;
+}
+
+/* 4. Corrección para inputs en modo oscuro dentro de WebViews nativos */
+input, select, textarea {
+    color-scheme: dark; 
+}

@@ -267,3 +267,133 @@ INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES
 (76, 'Lagos', 'Lagos'), (76, 'Kano', 'Kano'), (76, 'Oyo', 'Ibadan'), (76, 'FCT', 'Abuja'), (76, 'Rivers', 'Port Harcourt'),
 (77, 'Auckland', 'Auckland'), (77, 'Wellington', 'Wellington'), (77, 'Canterbury', 'Christchurch'), (77, 'Waikato', 'Hamilton'),
 (78, 'Gauteng', 'Johannesburg'), (78, 'Gauteng', 'Pretoria'), (78, 'Western Cape', 'Cape Town'), (78, 'KwaZulu-Natal', 'Durban'), (78, 'Eastern Cape', 'Gqeberha')//
+
+-- ======================================================
+-- 5. UBICACIONES FALTANTES (PAÍSES SIN REGISTROS PREVIOS)
+-- ======================================================
+
+-- GUYANA (ID 7)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(7, 'Demerara-Mahaica', 'Georgetown')//
+
+-- SURINAM (ID 10)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(10, 'Paramaribo', 'Paramaribo')//
+
+-- CUBA (ID 14)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(14, 'La Habana', 'La Habana'), 
+(14, 'Santiago de Cuba', 'Santiago de Cuba'), 
+(14, 'Camagüey', 'Camagüey')//
+
+-- EL SALVADOR (ID 15)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(15, 'San Salvador', 'San Salvador'), 
+(15, 'La Libertad', 'Santa Tecla'), 
+(15, 'Santa Ana', 'Santa Ana')//
+
+-- GUATEMALA (ID 16)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(16, 'Guatemala', 'Ciudad de Guatemala'), 
+(16, 'Quetzaltenango', 'Quetzaltenango'), 
+(16, 'Escuintla', 'Escuintla')//
+
+-- HONDURAS (ID 17)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(17, 'Francisco Morazán', 'Tegucigalpa'), 
+(17, 'Cortés', 'San Pedro Sula'), 
+(17, 'Atlántida', 'La Ceiba')//
+
+-- NICARAGUA (ID 18)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(18, 'Managua', 'Managua'), 
+(18, 'León', 'León'), 
+(18, 'Granada', 'Granada')//
+
+-- BÉLGICA (ID 26)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(26, 'Región de Bruselas-Capital', 'Bruselas'), 
+(26, 'Amberes', 'Amberes'), 
+(26, 'Flandes Oriental', 'Gante')//
+
+-- BULGARIA (ID 27)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(27, 'Sofía-Ciudad', 'Sofía'), 
+(27, 'Plovdiv', 'Plovdiv'), 
+(27, 'Varna', 'Varna')//
+
+-- CROACIA (ID 28)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(28, 'Ciudad de Zagreb', 'Zagreb'), 
+(28, 'Split-Dalmacia', 'Split'), 
+(28, 'Primorje-Gorski Kotar', 'Rijeka')//
+
+-- ESLOVAQUIA (ID 30)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(30, 'Bratislava', 'Bratislava'), 
+(30, 'Košice', 'Košice'), 
+(30, 'Prešov', 'Prešov')//
+
+-- ESLOVENIA (ID 31)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(31, 'Eslovenia Central', 'Liubliana'), 
+(31, 'Drava', 'Maribor')//
+
+-- ESTONIA (ID 33)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(33, 'Harju', 'Tallin'), 
+(33, 'Tartu', 'Tartu')//
+
+-- IRLANDA (ID 38)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(38, 'Dublín', 'Dublín'), 
+(38, 'Cork', 'Cork'), 
+(38, 'Galway', 'Galway')//
+
+-- ISLANDIA (ID 39)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(39, 'Región Capital', 'Reikiavik'), 
+(39, 'Norðurland eystra', 'Akureyri')//
+
+-- LETONIA (ID 41)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(41, 'Riga', 'Riga'), 
+(41, 'Latgale', 'Daugavpils')//
+
+-- LITUANIA (ID 42)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(42, 'Vilna', 'Vilna'), 
+(42, 'Kaunas', 'Kaunas'), 
+(42, 'Klaipėda', 'Klaipėda')//
+
+-- LUXEMBURGO (ID 43)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(43, 'Luxemburgo', 'Luxemburgo'), 
+(43, 'Esch-sur-Alzette', 'Esch-sur-Alzette')//
+
+-- MALTA (ID 44)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(44, 'Región Sudoriental', 'La Valeta'), 
+(44, 'Región Central', 'Birkirkara')//
+
+-- UCRANIA (ID 55)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(55, 'Ciudad de Kiev', 'Kiev'), 
+(55, 'Óblast de Járkov', 'Járkov'), 
+(55, 'Óblast de Leópolis', 'Leópolis'), 
+(55, 'Óblast de Odesa', 'Odesa')//
+
+-- QATAR (ID 66)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(66, 'Ad Dawhah', 'Doha'), 
+(66, 'Al Rayyan', 'Al Rayyan')//
+
+-- SINGAPUR (ID 67)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(67, 'Central', 'Singapur')//
+
+-- TAIWÁN (ID 69)
+INSERT OR IGNORE INTO locations (country_id, department, municipality) VALUES 
+(69, 'Taipéi', 'Taipéi'), 
+(69, 'Nueva Taipéi', 'Nueva Taipéi'), 
+(69, 'Kaohsiung', 'Kaohsiung')//

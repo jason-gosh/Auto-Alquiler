@@ -15,6 +15,7 @@
         "height": 720,
         "resizable": true,
         "fullscreen": false,
+        "backgroundColor": "#151522",
         "url": "http://localhost:8070"
       }
     ],

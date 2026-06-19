@@ -1,14 +1,11 @@
-<!doctype html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: mainLayout(~{::content})}">
-<head>
-    <title>Mi Perfil e Historial</title>
-</head>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: mainLayout(~{::section})}">
 <body>
-    <div th:fragment="content" class="space-y-8 max-w-5xl mx-auto">
+    <section  class="space-y-8 max-w-5xl mx-auto">
         <div class="border-b border-slate-800 pb-4">
             <h1 class="text-xl font-black uppercase tracking-tight text-white">Mi Perfil e Historial</h1>
             <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mt-1">
-                Configuración de datos legales y auditoría transaccional
+                Configuración de datos legales y auditoría de reservaciones.
             </p>
         </div>
 
@@ -70,15 +67,17 @@
                         <select
                             id="countrySelect"
                             class="w-full bg-[#151f32] text-white text-xs font-bold rounded-xl p-3 border border-slate-700 outline-none focus:border-blue-500 cursor-pointer"
-                            th:field="*{country}"
+                            th:name="country"
+                            th:value="*{country.country}"
                             required
                         >
                             <option value="">-- Seleccione un País --</option>
                             <option 
                                 th:each="c : ${countries}" 
-                                th:value="${{c}}"
+                                th:value="${c.id}"
                                 th:text="${c.country}"
                                 th:data-prefix="${c.postalNumber}"
+                                th:selected="${c.id} == *{country.id}"
                             >        
                             </option>
                         </select>
@@ -163,7 +162,7 @@
             <div th:replace="~{layout/tables/reservation-table.html :: reservationsTable}"></div>
         </div>
         
-        <script th:src="@{/js/location-phone-cascade.js}"></script>
-    </div>
+        <script th:src="@{/js/location-phone-cascade.js}" defer></script>
+    </section>
 </body>
 </html>

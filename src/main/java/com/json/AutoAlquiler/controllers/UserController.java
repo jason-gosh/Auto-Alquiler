@@ -76,7 +76,6 @@ public class UserController {
                 response.put("userId", userId);
             }
         );
-        System.out.println("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
         System.out.println(response);
         return response;
     }
